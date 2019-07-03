@@ -60,8 +60,8 @@ void DTNtupleTPGSimAnalyzer::book()
   m_outFile.cd();
 
   std::vector<std::string> chambTags = { "MB1", "MB2", "MB3", "MB4"};
-  std::vector<std::string> whTags    = { "Wh. -2", "Wh. -1", "Wh. 0", "Wh. +1", "Wh. +2"};
-  std::vector<std::string> secTags    = { "Sec. 1", "Sec. 2", "Sec. 3", "Sec. 4", "Sec. 5", "Sec. 6", "Sec. 7", "Sec. 8","Sec. 9","Sec. 10","Sec. 11","Sec. 12","Sec. 13","Sec. 14"};
+  std::vector<std::string> whTags    = { "Wh.-2", "Wh.-1", "Wh.0", "Wh.+1", "Wh.+2"};
+  std::vector<std::string> secTags    = { "Sec.1", "Sec.2", "Sec.3", "Sec.4", "Sec.5", "Sec.6", "Sec.7", "Sec.8","Sec.9","Sec.10","Sec.11","Sec.12","Sec.13","Sec.14"};
 
   
   m_plots["DirRes_P2"] = new TH1F("hDirRes_P2",
@@ -105,8 +105,8 @@ void DTNtupleTPGSimAnalyzer::book()
 void DTNtupleTPGSimAnalyzer::fill()
 {
   std::vector<std::string> chambTags = { "MB1", "MB2", "MB3", "MB4"};
-  std::vector<std::string> whTags    = { "Wh. -2", "Wh. -1", "Wh. 0", "Wh. +1", "Wh. +2"};
-  std::vector<std::string> secTags    = { "Sec. 1", "Sec. 2", "Sec. 3", "Sec. 4", "Sec. 5", "Sec. 6", "Sec. 7", "Sec. 8","Sec. 9","Sec. 10","Sec. 11","Sec. 12","Sec. 13","Sec. 14"};
+  std::vector<std::string> whTags    = { "Wh.-2", "Wh.-1", "Wh.0", "Wh.+1", "Wh.+2"};
+  std::vector<std::string> secTags    = { "Sec.1", "Sec.2", "Sec.3", "Sec.4", "Sec.5", "Sec.6", "Sec.7", "Sec.8","Sec.9","Sec.10","Sec.11","Sec.12","Sec.13","Sec.14"};
 
   for (std::size_t iGenPart = 0; iGenPart < gen_nGenParts; ++iGenPart)
     {
