@@ -191,8 +191,8 @@ void DTNtupleTPGSimAnalyzer::fill()
           {
             bestTPHB          = iTrigHB;
             bestSegTrigHBDPhi = segTrigHBDPhi;
-            bestHBDPhi        = finalHBDPhi;
-          }
+            bestHBDPhi        = finalHBDPhi + ((finalHBDPhi > TMath::Pi()) ? -2*TMath::Pi() : 0) +  ((finalHBDPhi < -TMath::Pi()) ? 2*TMath::Pi() : 0);
+	  } 
         }
       }
 
@@ -246,7 +246,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           {
             bestTPAM          = iTrigAM;
             bestSegTrigAMDPhi = segTrigAMDPhi;
-            bestAMDPhi        = finalAMDPhi;
+            bestAMDPhi        = finalAMDPhi  + ((finalAMDPhi > TMath::Pi()) ? -2*TMath::Pi() : 0) +  ((finalAMDPhi < -TMath::Pi()) ? 2*TMath::Pi() : 0);
           }
         }
       }
