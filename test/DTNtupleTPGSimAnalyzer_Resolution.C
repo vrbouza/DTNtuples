@@ -1,5 +1,6 @@
 #include "DTNtupleTPGSimAnalyzer.h"
-
+#include "TVector2.h"
+#include "TF1.h"
 
 DTNtupleTPGSimAnalyzer::DTNtupleTPGSimAnalyzer(const TString & inFileName,
                                                const TString & outFileName):
@@ -191,7 +192,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           {
             bestTPHB          = iTrigHB;
             bestSegTrigHBDPhi = segTrigHBDPhi;
-            bestHBDPhi        = finalHBDPhi + ((finalHBDPhi > TMath::Pi()) ? -2*TMath::Pi() : 0) +  ((finalHBDPhi < -TMath::Pi()) ? 2*TMath::Pi() : 0);
+            bestHBDPhi        = TVector2::Phi_mpi_pi(finalHBDPhi);
 	  } 
         }
       }
@@ -246,7 +247,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           {
             bestTPAM          = iTrigAM;
             bestSegTrigAMDPhi = segTrigAMDPhi;
-            bestAMDPhi        = finalAMDPhi  + ((finalAMDPhi > TMath::Pi()) ? -2*TMath::Pi() : 0) +  ((finalAMDPhi < -TMath::Pi()) ? 2*TMath::Pi() : 0);
+            bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
           }
         }
       }
@@ -280,12 +281,43 @@ void DTNtupleTPGSimAnalyzer::fill()
       }
     }
   }
+
+
+  
 }
 
+TH1F* DTNtupleTPGSimAnalyzer::makeHistoPer( std::string mag, std::string suffix, vector<std::string> tags, std::string algo)
+{
+  TH1F* ret = new TH1F((mag+suffix).c_str(),"",
+		       tags.size(), -0.5,-0.5+tags.size());
+  for (unsigned int i = 0; i < tags.size(); ++i){
+    ret->GetXaxis()->SetBinLabel(i+1, tags[i].c_str());
 
+    if (m_plots[mag + "_P2_" + algo + tags[i]]->Integral()){
+      m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ");
+      ret->SetBinContent(i+1, m_plots[mag + "_P2_" + algo + tags[i]]->GetFunction("gaus")->GetParameter(2));
+    }
+  }
+  return ret;
+}
 
 void DTNtupleTPGSimAnalyzer::endJob()
 {
+
+  // make the fits
+  std::vector<std::string> chambTags = { "MB1", "MB2", "MB3", "MB4"};
+  std::vector<std::string> whTags    = { "Wh.-2", "Wh.-1", "Wh.0", "Wh.+1", "Wh.+2"};
+  std::vector<std::string> secTags   = { "Sec.1", "Sec.2", "Sec.3", "Sec.4", "Sec.5", "Sec.6", "Sec.7", "Sec.8","Sec.9","Sec.10","Sec.11","Sec.12","Sec.13","Sec.14"};
+  std::vector<std::string> magnitudes = { "TimRes", "PosRes", "DirRes"};
+  std::vector<std::string> algos = { "AM", "HB" };
+  for (const auto & mag : magnitudes){
+    for (const auto & algo : algos){
+      m_plots[mag + "_" + algo + "_Res_perChamb"] = makeHistoPer( mag, "_Res_perChamb", chambTags, algo);
+      m_plots[mag + "_" + algo + "_Res_perWheel"] = makeHistoPer( mag, "_Res_perWheel", whTags   , algo);
+      m_plots[mag + "_" + algo + "_Res_perSec"]   = makeHistoPer( mag, "_Res_perSec"  , secTags  , algo);
+    }
+  }
+
 
   m_outFile.cd();
 

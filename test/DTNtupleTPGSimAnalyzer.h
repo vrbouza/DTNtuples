@@ -41,6 +41,7 @@ private:
   std::map<std::string, TH1*> m_plots;
   std::map<std::string, TEfficiency*> m_effs;
   
+  TH1F* makeHistoPer( std::string, std::string, vector<std::string>, std::string);  
   Double_t m_minMuPt;
   
   Double_t m_maxMuSegDPhi;
