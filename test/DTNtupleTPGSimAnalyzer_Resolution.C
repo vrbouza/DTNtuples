@@ -237,9 +237,12 @@ void DTNtupleTPGSimAnalyzer::fill()
 
         // x
         Double_t segLocalHBDx = 0;
-        if      (ph2TpgPhiEmuHb_quality->at(bestTPHB) >= 6)    segLocalHBDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
-        else if (ph2TpgPhiEmuHb_superLayer->at(bestTPHB) == 1) segLocalHBDx = seg_posLoc_x_SL1->at(iSeg)      - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
-        else                                                   segLocalHBDx = seg_posLoc_x_SL3->at(iSeg)      - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        if ((ph2TpgPhiEmuHb_quality->at(bestTPHB) == 6) || (ph2TpgPhiEmuHb_quality->at(bestTPHB) == 8) || (ph2TpgPhiEmuHb_quality->at(bestTPHB) == 9))
+        {
+          segLocalHBDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        }
+        else if (ph2TpgPhiEmuHb_superLayer->at(bestTPHB) == 1) segLocalHBDx = seg_posLoc_x_SL1->at(iSeg) - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        else                                                   segLocalHBDx = seg_posLoc_x_SL3->at(iSeg) - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
         m_plots["xRes_P2_HB"]           ->Fill( segLocalHBDx );
         m_plots["xRes_P2_HB" + whTag]   ->Fill( segLocalHBDx );
         m_plots["xRes_P2_HB" + secTag]  ->Fill( segLocalHBDx );
@@ -303,9 +306,12 @@ void DTNtupleTPGSimAnalyzer::fill()
 
         // x
         Double_t segLocalAMDx = 0;
-        if      (ph2TpgPhiEmuAm_quality->at(bestTPAM) >= 6)    segLocalAMDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
-        else if (ph2TpgPhiEmuAm_superLayer->at(bestTPAM) == 1) segLocalAMDx = seg_posLoc_x_SL1->at(iSeg)      - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
-        else                                                   segLocalAMDx = seg_posLoc_x_SL3->at(iSeg)      - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        if ((ph2TpgPhiEmuAm_quality->at(bestTPAM) == 6) || (ph2TpgPhiEmuAm_quality->at(bestTPAM) == 8) || (ph2TpgPhiEmuAm_quality->at(bestTPAM) == 9))
+        {
+          segLocalAMDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        }
+        else if (ph2TpgPhiEmuAm_superLayer->at(bestTPAM) == 1) segLocalAMDx = seg_posLoc_x_SL1->at(iSeg) - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        else                                                   segLocalAMDx = seg_posLoc_x_SL3->at(iSeg) - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
         m_plots["xRes_P2_AM"]           ->Fill( segLocalAMDx );
         m_plots["xRes_P2_AM" + whTag]   ->Fill( segLocalAMDx );
         m_plots["xRes_P2_AM" + secTag]  ->Fill( segLocalAMDx );
