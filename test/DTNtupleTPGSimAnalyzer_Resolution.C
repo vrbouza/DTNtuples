@@ -70,55 +70,67 @@ void DTNtupleTPGSimAnalyzer::book()
 
   for (const auto & algo : algoTag)
   {
-    Double_t limdir   = 0.15; Double_t limpos   = 0.005; Double_t limtime  = 5;
-    UShort_t nbinsdir = 101;  UShort_t nbinspos = 101;   UShort_t nbinstim = 11;
-    m_plots["DirRes_P2" + algo] = new TH1F(("hDirRes_P2"+ algo).c_str() ,
-            "DirRes Seg-TP total distribution; #Delta#phi (rad); entries",
-            nbinsdir,-limdir,+limdir);
-    m_plots["PosRes_P2" + algo] = new TH1F(("hPosRes_P2"+ algo).c_str(),
-            "PosRes Seg-TP total distribution; #Delta#phi (rad); entries",
-            nbinspos,-limpos,+limpos);
-    m_plots["TimRes_P2" + algo] = new TH1S(("hTimRes_P2"+ algo).c_str(),
-            "TimRes Seg-TP total distribution; #Delta t (ns); entries",
-            nbinstim,-limtime,+limtime);
+    Double_t limtanpsi   = 0.1; Double_t limphi   = 0.005; Double_t limtime  = 5;   Double_t limx   = 0.2;
+    UShort_t nbinstanpsi = 101; UShort_t nbinsphi = 101;   UShort_t nbinstime = 11; UShort_t nbinsx = 101;
+    m_plots["TanPsiRes_P2" + algo] = new TH1F(("hTanPsiRes_P2"+ algo).c_str() ,
+            "TanPsiRes Seg-TP total distribution; #Delta tan(#psi) (adim.); entries",
+            nbinstanpsi,-limtanpsi,+limtanpsi);
+    m_plots["PhiRes_P2" + algo] = new TH1F(("hPhiRes_P2"+ algo).c_str(),
+            "PhiRes Seg-TP total distribution; #Delta#phi (rad); entries",
+            nbinsphi,-limphi,+limphi);
+    m_plots["TimeRes_P2" + algo] = new TH1S(("hTimeRes_P2"+ algo).c_str(),
+            "TimeRes Seg-TP total distribution; #Delta BX (adim.); entries",
+            nbinstime,-limtime,+limtime);
+    m_plots["xRes_P2" + algo] = new TH1S(("hxRes_P2"+ algo).c_str(),
+            "xRes Seg-TP total distribution; #Delta x (cm); entries",
+            nbinsx,-limx,+limx);
 
     for (const auto & whTag : whTags)
     {
-      m_plots["DirRes_P2" + algo + whTag] = new TH1F(("hDirRes" + algo +"_" + whTag +  "_P2").c_str(),
-                ("DirRes Seg-TP distribution for " + whTag +  "; #Delta#phi (rad); entries").c_str(),
-                nbinsdir,-limdir,+limdir);
-      m_plots["PosRes_P2" + algo + whTag] = new TH1F(("hPosRes" + algo  +"_" + whTag +  "_P2").c_str(),
-                ("PosRes Seg-TP distribution for " + whTag +  "; #Delta#phi (rad); entries").c_str(),
-                nbinspos,-limpos,+limpos);
-      m_plots["TimRes_P2" + algo + whTag] = new TH1S(("hTimRes" + algo  +"_" + whTag +  "_P2").c_str(),
-                ("TimRes Seg-TP distribution for " + whTag +  "; #Delta t (ns); entries").c_str(),
-                nbinstim,-limtime,+limtime);
+      m_plots["TanPsiRes_P2" + algo + whTag] = new TH1F(("hTanPsiRes" + algo +"_" + whTag +  "_P2").c_str(),
+                ("TanPsiRes Seg-TP distribution for " + whTag +  "; #Delta tan(#psi) (adim.); entries").c_str(),
+                nbinstanpsi,-limtanpsi,+limtanpsi);
+      m_plots["PhiRes_P2" + algo + whTag] = new TH1F(("hPhiRes" + algo  +"_" + whTag +  "_P2").c_str(),
+                ("PhiRes Seg-TP distribution for " + whTag +  "; #Delta#phi (rad); entries").c_str(),
+                nbinsphi,-limphi,+limphi);
+      m_plots["TimeRes_P2" + algo + whTag] = new TH1S(("hTimeRes" + algo  +"_" + whTag +  "_P2").c_str(),
+                ("TimeRes Seg-TP distribution for " + whTag +  "; #Delta BX (adim.); entries").c_str(),
+                nbinstime,-limtime,+limtime);
+      m_plots["xRes_P2" + algo + whTag] = new TH1S(("hxRes" + algo  +"_" + whTag +  "_P2").c_str(),
+                ("xRes Seg-TP distribution for " + whTag +  "; #Delta x (cm); entries").c_str(),
+                nbinsx,-limx,+limx);
     }
 
     for (const auto & secTag : secTags)
     {
-      m_plots["DirRes_P2" + algo + secTag] = new TH1F(("hDirRes" + algo  +"_" + secTag +  "_P2").c_str(),
-                ("DirRes Seg-TP distribution for " + secTag +  "; #Delta#phi (rad); entries").c_str(),
-                nbinsdir,-limdir,+limdir);
-      m_plots["PosRes_P2" + algo + secTag] = new TH1F(("hPosRes" + algo  +"_" + secTag +  "_P2").c_str(),
-                ("PosRes Seg-TP distribution for " + secTag +  "; #Delta#phi (rad); entries").c_str(),
-                nbinspos,-limpos,+limpos);
-      m_plots["TimRes_P2" + algo + secTag] = new TH1S(("hTimRes" + algo  +"_" + secTag +  "_P2").c_str(),
-                ("TimRes Seg-TP distribution for " + secTag +  "; #Delta t (ns); entries").c_str(),
-                nbinstim,-limtime,+limtime);
+      m_plots["TanPsiRes_P2" + algo + secTag] = new TH1F(("hTanPsiRes" + algo  +"_" + secTag +  "_P2").c_str(),
+                ("TanPsiRes Seg-TP distribution for " + secTag +  "; #Delta tan(#psi) (adim.); entries").c_str(),
+                nbinstanpsi,-limtanpsi,+limtanpsi);
+      m_plots["PhiRes_P2" + algo + secTag] = new TH1F(("hPhiRes" + algo  +"_" + secTag +  "_P2").c_str(),
+                ("PhiRes Seg-TP distribution for " + secTag +  "; #Delta#phi (rad); entries").c_str(),
+                nbinsphi,-limphi,+limphi);
+      m_plots["TimeRes_P2" + algo + secTag] = new TH1S(("hTimeRes" + algo  +"_" + secTag +  "_P2").c_str(),
+                ("TimeRes Seg-TP distribution for " + secTag +  "; #Delta BX (adim.); entries").c_str(),
+                nbinstime,-limtime,+limtime);
+      m_plots["xRes_P2" + algo + secTag] = new TH1S(("hxRes" + algo  +"_" + secTag +  "_P2").c_str(),
+                ("xRes Seg-TP distribution for " + secTag +  "; #Delta x (cm); entries").c_str(),
+                nbinsx,-limx,+limx);
     }
 
     for (const auto & chambTag : chambTags)
     {
-      m_plots["DirRes_P2" + algo + chambTag] = new TH1F(("hDirRes" + algo  +"_" + chambTag +  "_P2").c_str(),
-            ("DirRes Seg-TP distribution for " + chambTag +  "; #Delta#phi (rad); entries").c_str(),
-            nbinsdir,-limdir,+limdir);
-      m_plots["PosRes_P2" + algo + chambTag] = new TH1F(("hPosRes" + algo  +"_" + chambTag +  "_P2").c_str(),
-            ("PosRes Seg-TP distribution for " + chambTag +  "; #Delta#phi (rad); entries").c_str(),
-            nbinspos,-limpos,+limpos);
-      m_plots["TimRes_P2" + algo + chambTag] = new TH1S(("hTimRes" + algo  +"_" + chambTag +  "_P2").c_str(),
-            ("TimRes Seg-TP distribution for " + chambTag +  "; #Delta t (ns); entries").c_str(),
-            nbinstim,-limtime,+limtime);
+      m_plots["TanPsiRes_P2" + algo + chambTag] = new TH1F(("hTanPsiRes" + algo  +"_" + chambTag +  "_P2").c_str(),
+            ("TanPsiRes Seg-TP distribution for " + chambTag +  "; #Delta tan(#psi) (adim.); entries").c_str(),
+            nbinstanpsi,-limtanpsi,+limtanpsi);
+      m_plots["PhiRes_P2" + algo + chambTag] = new TH1F(("hPhiRes" + algo  +"_" + chambTag +  "_P2").c_str(),
+            ("PhiRes Seg-TP distribution for " + chambTag +  "; #Delta#phi (rad); entries").c_str(),
+            nbinsphi,-limphi,+limphi);
+      m_plots["TimeRes_P2" + algo + chambTag] = new TH1S(("hTimeRes" + algo  +"_" + chambTag +  "_P2").c_str(),
+            ("TimeRes Seg-TP distribution for " + chambTag +  "; #Delta BX (adim.); entries").c_str(),
+            nbinstime,-limtime,+limtime);
+      m_plots["xRes_P2" + algo + chambTag] = new TH1S(("hxRes" + algo  +"_" + chambTag +  "_P2").c_str(),
+            ("xRes Seg-TP distribution for " + chambTag +  "; #Delta x (cm); entries").c_str(),
+            nbinsx,-limx,+limx);
     }
   }
 }
@@ -188,40 +200,50 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalHBDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigHBDPhi = abs(acos(cos(finalHBDPhi)));
 //           if (segTrigHBDPhi < m_maxSegTrigDPhi && trigHBBX == 20 &&  bestSegTrigHBDPhi > segTrigHBDPhi)
-          if (segTrigHBDPhi < m_maxSegTrigDPhi &&  bestSegTrigHBDPhi > segTrigHBDPhi)
+          if (segTrigHBDPhi < m_maxSegTrigDPhi && bestSegTrigHBDPhi > segTrigHBDPhi)
           {
             bestTPHB          = iTrigHB;
             bestSegTrigHBDPhi = segTrigHBDPhi;
             bestHBDPhi        = TVector2::Phi_mpi_pi(finalHBDPhi);
-	  } 
+          }
         }
       }
 
       if (bestTPHB > -1)
       {
-        // Slope
-        Double_t segLocalHBDPhi = TMath::ATan ( ( seg_dirLoc_x->at(iSeg) / seg_dirLoc_z->at(iSeg)) ) - 2*TMath::Pi()* ph2TpgPhiEmuHb_dirLoc_phi->at(bestTPHB) /360;
-        m_plots["DirRes_P2_HB"]           ->Fill( segLocalHBDPhi );
-        m_plots["DirRes_P2_HB" + whTag]   ->Fill( segLocalHBDPhi );
-        m_plots["DirRes_P2_HB" + secTag]  ->Fill( segLocalHBDPhi );
-        m_plots["DirRes_P2_HB" + chambTag]->Fill( segLocalHBDPhi );
+        // TanPsi
+        Double_t segLocalHBDtanpsi = (seg_dirLoc_x->at(iSeg) / seg_dirLoc_z->at(iSeg)) - TMath::TwoPi() * ph2TpgPhiEmuHb_dirLoc_phi->at(bestTPHB) / 360;
+        m_plots["TanPsiRes_P2_HB"]           ->Fill( segLocalHBDtanpsi );
+        m_plots["TanPsiRes_P2_HB" + whTag]   ->Fill( segLocalHBDtanpsi );
+        m_plots["TanPsiRes_P2_HB" + secTag]  ->Fill( segLocalHBDtanpsi );
+        m_plots["TanPsiRes_P2_HB" + chambTag]->Fill( segLocalHBDtanpsi );
 
-        // DPhi
-        m_plots["PosRes_P2_HB"]           ->Fill( bestHBDPhi );
-        m_plots["PosRes_P2_HB" + whTag]   ->Fill( bestHBDPhi );
-        m_plots["PosRes_P2_HB" + secTag]  ->Fill( bestHBDPhi );
-        m_plots["PosRes_P2_HB" + chambTag]->Fill( bestHBDPhi );
+        // Phi
+        m_plots["PhiRes_P2_HB"]           ->Fill( bestHBDPhi );
+        m_plots["PhiRes_P2_HB" + whTag]   ->Fill( bestHBDPhi );
+        m_plots["PhiRes_P2_HB" + secTag]  ->Fill( bestHBDPhi );
+        m_plots["PhiRes_P2_HB" + chambTag]->Fill( bestHBDPhi );
 
         // Time
         if (seg_phi_t0->at(iSeg) > -500)
         {
           Short_t segLocalHBDtime = ((Short_t) (seg_phi_t0->at(iSeg) / 10 )) - (ph2TpgPhiEmuHb_BX->at(bestTPHB) - 20);
 
-          m_plots["TimRes_P2_HB"]           ->Fill( segLocalHBDtime );
-          m_plots["TimRes_P2_HB" + whTag]   ->Fill( segLocalHBDtime );
-          m_plots["TimRes_P2_HB" + secTag]  ->Fill( segLocalHBDtime );
-          m_plots["TimRes_P2_HB" + chambTag]->Fill( segLocalHBDtime );
+          m_plots["TimeRes_P2_HB"]           ->Fill( segLocalHBDtime );
+          m_plots["TimeRes_P2_HB" + whTag]   ->Fill( segLocalHBDtime );
+          m_plots["TimeRes_P2_HB" + secTag]  ->Fill( segLocalHBDtime );
+          m_plots["TimeRes_P2_HB" + chambTag]->Fill( segLocalHBDtime );
         }
+
+        // x
+        Double_t segLocalHBDx = 0;
+        if      (ph2TpgPhiEmuHb_quality->at(bestTPHB) >= 6)    segLocalHBDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        else if (ph2TpgPhiEmuHb_superLayer->at(bestTPHB) == 1) segLocalHBDx = seg_posLoc_x_SL1->at(iSeg)      - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        else                                                   segLocalHBDx = seg_posLoc_x_SL3->at(iSeg)      - ph2TpgPhiEmuHb_posLoc_x->at(bestTPHB);
+        m_plots["xRes_P2_HB"]           ->Fill( segLocalHBDx );
+        m_plots["xRes_P2_HB" + whTag]   ->Fill( segLocalHBDx );
+        m_plots["xRes_P2_HB" + secTag]  ->Fill( segLocalHBDx );
+        m_plots["xRes_P2_HB" + chambTag]->Fill( segLocalHBDx );
       }
 
 
@@ -254,18 +276,18 @@ void DTNtupleTPGSimAnalyzer::fill()
 
       if (bestTPAM > -1)
       {
-        // Slope
-        Double_t segLocalAMDPhi  = TMath::ATan ( ( seg_dirLoc_x->at(iSeg) / seg_dirLoc_z->at(iSeg)) ) - TMath::TwoPi() * ph2TpgPhiEmuAm_dirLoc_phi->at(bestTPAM) / 360;
-        m_plots["DirRes_P2_AM"]           ->Fill( segLocalAMDPhi );
-        m_plots["DirRes_P2_AM" + whTag]   ->Fill( segLocalAMDPhi );
-        m_plots["DirRes_P2_AM" + secTag]  ->Fill( segLocalAMDPhi );
-        m_plots["DirRes_P2_AM" + chambTag]->Fill( segLocalAMDPhi );
+        // TanPsi
+        Double_t segLocalAMDtanpsi = (seg_dirLoc_x->at(iSeg) / seg_dirLoc_z->at(iSeg)) - TMath::TwoPi() * ph2TpgPhiEmuAm_dirLoc_phi->at(bestTPAM) / 360;
+        m_plots["TanPsiRes_P2_AM"]           ->Fill( segLocalAMDtanpsi );
+        m_plots["TanPsiRes_P2_AM" + whTag]   ->Fill( segLocalAMDtanpsi );
+        m_plots["TanPsiRes_P2_AM" + secTag]  ->Fill( segLocalAMDtanpsi );
+        m_plots["TanPsiRes_P2_AM" + chambTag]->Fill( segLocalAMDtanpsi );
 
-        // DPhi
-        m_plots["PosRes_P2_AM"]           ->Fill( bestAMDPhi );
-        m_plots["PosRes_P2_AM" + whTag]   ->Fill( bestAMDPhi );
-        m_plots["PosRes_P2_AM" + secTag]  ->Fill( bestAMDPhi );
-        m_plots["PosRes_P2_AM" + chambTag]->Fill( bestAMDPhi );
+        // Phi
+        m_plots["PhiRes_P2_AM"]           ->Fill( bestAMDPhi );
+        m_plots["PhiRes_P2_AM" + whTag]   ->Fill( bestAMDPhi );
+        m_plots["PhiRes_P2_AM" + secTag]  ->Fill( bestAMDPhi );
+        m_plots["PhiRes_P2_AM" + chambTag]->Fill( bestAMDPhi );
 
         // Time
         if (seg_phi_t0->at(iSeg) > -500)
@@ -273,23 +295,32 @@ void DTNtupleTPGSimAnalyzer::fill()
           Short_t segLocalAMDtime = ((Short_t) (seg_phi_t0->at(iSeg) / 10 )) - ph2TpgPhiEmuAm_BX->at(bestTPAM);
 
           // Time
-          m_plots["TimRes_P2_AM"]           ->Fill( segLocalAMDtime );
-          m_plots["TimRes_P2_AM" + whTag]   ->Fill( segLocalAMDtime );
-          m_plots["TimRes_P2_AM" + secTag]  ->Fill( segLocalAMDtime );
-          m_plots["TimRes_P2_AM" + chambTag]->Fill( segLocalAMDtime );
+          m_plots["TimeRes_P2_AM"]           ->Fill( segLocalAMDtime );
+          m_plots["TimeRes_P2_AM" + whTag]   ->Fill( segLocalAMDtime );
+          m_plots["TimeRes_P2_AM" + secTag]  ->Fill( segLocalAMDtime );
+          m_plots["TimeRes_P2_AM" + chambTag]->Fill( segLocalAMDtime );
         }
+
+        // x
+        Double_t segLocalAMDx = 0;
+        if      (ph2TpgPhiEmuAm_quality->at(bestTPAM) >= 6)    segLocalAMDx = seg_posLoc_x_midPlane->at(iSeg) - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        else if (ph2TpgPhiEmuAm_superLayer->at(bestTPAM) == 1) segLocalAMDx = seg_posLoc_x_SL1->at(iSeg)      - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        else                                                   segLocalAMDx = seg_posLoc_x_SL3->at(iSeg)      - ph2TpgPhiEmuAm_posLoc_x->at(bestTPAM);
+        m_plots["xRes_P2_AM"]           ->Fill( segLocalAMDx );
+        m_plots["xRes_P2_AM" + whTag]   ->Fill( segLocalAMDx );
+        m_plots["xRes_P2_AM" + secTag]  ->Fill( segLocalAMDx );
+        m_plots["xRes_P2_AM" + chambTag]->Fill( segLocalAMDx );
       }
     }
   }
-
-
-  
 }
+
+
 
 TH1F* DTNtupleTPGSimAnalyzer::makeHistoPer( std::string mag, std::string suffix, vector<std::string> tags, std::string algo)
 {
   TH1F* ret = new TH1F((mag+suffix).c_str(),"",
-		       tags.size(), -0.5,-0.5+tags.size());
+            tags.size(), -0.5,-0.5+tags.size());
   for (unsigned int i = 0; i < tags.size(); ++i){
     ret->GetXaxis()->SetBinLabel(i+1, tags[i].c_str());
 
@@ -301,17 +332,20 @@ TH1F* DTNtupleTPGSimAnalyzer::makeHistoPer( std::string mag, std::string suffix,
   return ret;
 }
 
+
+
 void DTNtupleTPGSimAnalyzer::endJob()
 {
-
   // make the fits
   std::vector<std::string> chambTags = { "MB1", "MB2", "MB3", "MB4"};
   std::vector<std::string> whTags    = { "Wh.-2", "Wh.-1", "Wh.0", "Wh.+1", "Wh.+2"};
   std::vector<std::string> secTags   = { "Sec.1", "Sec.2", "Sec.3", "Sec.4", "Sec.5", "Sec.6", "Sec.7", "Sec.8","Sec.9","Sec.10","Sec.11","Sec.12","Sec.13","Sec.14"};
-  std::vector<std::string> magnitudes = { "TimRes", "PosRes", "DirRes"};
-  std::vector<std::string> algos = { "AM", "HB" };
-  for (const auto & mag : magnitudes){
-    for (const auto & algo : algos){
+  std::vector<std::string> magnitudes = { "TimeRes", "PhiRes", "TanPsiRes", "xRes"};
+  std::vector<std::string> algos      = { "AM", "HB" };
+  for (const auto & mag : magnitudes)
+  {
+    for (const auto & algo : algos)
+    {
       m_plots[mag + "_" + algo + "_Res_perChamb"] = makeHistoPer( mag, "_Res_perChamb", chambTags, algo);
       m_plots[mag + "_" + algo + "_Res_perWheel"] = makeHistoPer( mag, "_Res_perWheel", whTags   , algo);
       m_plots[mag + "_" + algo + "_Res_perSec"]   = makeHistoPer( mag, "_Res_perSec"  , secTags  , algo);
@@ -323,7 +357,6 @@ void DTNtupleTPGSimAnalyzer::endJob()
 
   m_outFile.Write();
   m_outFile.Close();
-
 }
 
 
