@@ -71,7 +71,7 @@ void DTNtupleTPGSimAnalyzer::book()
   for (const auto & algo : algoTag)
   {
     Double_t limtanpsi   = 0.1; Double_t limphi   = 0.005; Double_t limtime  = 5;   Double_t limx   = 0.2;
-    UShort_t nbinstanpsi = 101; UShort_t nbinsphi = 101;   UShort_t nbinstime = 11; UShort_t nbinsx = 101;
+    UShort_t nbinstanpsi = 200; UShort_t nbinsphi = 150;   UShort_t nbinstime = 11; UShort_t nbinsx = 101;
     m_plots["TanPsiRes_P2" + algo] = new TH1F(("hTanPsiRes_P2"+ algo).c_str() ,
             "TanPsiRes Seg-TP total distribution; #Delta tan(#psi) (adim.); entries",
             nbinstanpsi,-limtanpsi,+limtanpsi);
@@ -332,8 +332,9 @@ TH1F* DTNtupleTPGSimAnalyzer::makeHistoPer( std::string mag, std::string suffix,
 
     if (m_plots[mag + "_P2_" + algo + tags[i]]->Integral()) {
 
-      if (mag != "PhiRes") m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ");
-      else                 m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ", "", -0.0005, 0.0005);
+      if      (mag == "PhiRes")    m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ", "", -0.0005, 0.0005);
+      else if (mag == "TanPsiRes") m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ", "", -0.01, 0.01);
+      else                         m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ");
 
       ret->SetBinContent(i+1, m_plots[mag + "_P2_" + algo + tags[i]]->GetFunction("gaus")->GetParameter(2));
     }

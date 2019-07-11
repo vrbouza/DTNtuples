@@ -23,7 +23,7 @@ for plot in ['PhiRes_%s_Res_perChamb', 'PhiRes_%s_Res_perSec', 'PhiRes_%s_Res_pe
     am = res.Get(plot%'AM')
     am.SetLineColor(r.kRed)
 
-    hb.GetYaxis().SetRangeUser(0, max([hb.GetMaximum(), am.GetMaximum()]))
+    hb.GetYaxis().SetRangeUser(0, max([hb.GetMaximum(), am.GetMaximum()]) + max([hb.GetMaximum(), am.GetMaximum()]) * 0.1)
     hb.Draw()
     am.Draw('same')
     c.SaveAs("~vrbouza/www/Miscelánea/2019_07_11_ejsplots/" + plot%'comparison' + '.png')
