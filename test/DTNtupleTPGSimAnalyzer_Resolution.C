@@ -81,7 +81,7 @@ void DTNtupleTPGSimAnalyzer::book()
     m_plots["TimeRes_P2" + algo] = new TH1S(("hTimeRes_P2"+ algo).c_str(),
             "TimeRes Seg-TP total distribution; #Delta BX (adim.); entries",
             nbinstime,-limtime,+limtime);
-    m_plots["xRes_P2" + algo] = new TH1S(("hxRes_P2"+ algo).c_str(),
+    m_plots["xRes_P2" + algo] = new TH1F(("hxRes_P2"+ algo).c_str(),
             "xRes Seg-TP total distribution; #Delta x (cm); entries",
             nbinsx,-limx,+limx);
 
@@ -96,7 +96,7 @@ void DTNtupleTPGSimAnalyzer::book()
       m_plots["TimeRes_P2" + algo + whTag] = new TH1S(("hTimeRes" + algo  +"_" + whTag +  "_P2").c_str(),
                 ("TimeRes Seg-TP distribution for " + whTag +  "; #Delta BX (adim.); entries").c_str(),
                 nbinstime,-limtime,+limtime);
-      m_plots["xRes_P2" + algo + whTag] = new TH1S(("hxRes" + algo  +"_" + whTag +  "_P2").c_str(),
+      m_plots["xRes_P2" + algo + whTag] = new TH1F(("hxRes" + algo  +"_" + whTag +  "_P2").c_str(),
                 ("xRes Seg-TP distribution for " + whTag +  "; #Delta x (cm); entries").c_str(),
                 nbinsx,-limx,+limx);
     }
@@ -112,7 +112,7 @@ void DTNtupleTPGSimAnalyzer::book()
       m_plots["TimeRes_P2" + algo + secTag] = new TH1S(("hTimeRes" + algo  +"_" + secTag +  "_P2").c_str(),
                 ("TimeRes Seg-TP distribution for " + secTag +  "; #Delta BX (adim.); entries").c_str(),
                 nbinstime,-limtime,+limtime);
-      m_plots["xRes_P2" + algo + secTag] = new TH1S(("hxRes" + algo  +"_" + secTag +  "_P2").c_str(),
+      m_plots["xRes_P2" + algo + secTag] = new TH1F(("hxRes" + algo  +"_" + secTag +  "_P2").c_str(),
                 ("xRes Seg-TP distribution for " + secTag +  "; #Delta x (cm); entries").c_str(),
                 nbinsx,-limx,+limx);
     }
@@ -128,7 +128,7 @@ void DTNtupleTPGSimAnalyzer::book()
       m_plots["TimeRes_P2" + algo + chambTag] = new TH1S(("hTimeRes" + algo  +"_" + chambTag +  "_P2").c_str(),
             ("TimeRes Seg-TP distribution for " + chambTag +  "; #Delta BX (adim.); entries").c_str(),
             nbinstime,-limtime,+limtime);
-      m_plots["xRes_P2" + algo + chambTag] = new TH1S(("hxRes" + algo  +"_" + chambTag +  "_P2").c_str(),
+      m_plots["xRes_P2" + algo + chambTag] = new TH1F(("hxRes" + algo  +"_" + chambTag +  "_P2").c_str(),
             ("xRes Seg-TP distribution for " + chambTag +  "; #Delta x (cm); entries").c_str(),
             nbinsx,-limx,+limx);
     }
@@ -325,13 +325,16 @@ void DTNtupleTPGSimAnalyzer::fill()
 
 TH1F* DTNtupleTPGSimAnalyzer::makeHistoPer( std::string mag, std::string suffix, vector<std::string> tags, std::string algo)
 {
-  TH1F* ret = new TH1F((mag+suffix).c_str(),"",
+  TH1F* ret = new TH1F((mag + "_" + algo + suffix).c_str(),"",
             tags.size(), -0.5,-0.5+tags.size());
   for (unsigned int i = 0; i < tags.size(); ++i){
     ret->GetXaxis()->SetBinLabel(i+1, tags[i].c_str());
 
-    if (m_plots[mag + "_P2_" + algo + tags[i]]->Integral()){
-      m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ");
+    if (m_plots[mag + "_P2_" + algo + tags[i]]->Integral()) {
+
+      if (mag != "PhiRes") m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ");
+      else                 m_plots[mag + "_P2_" + algo + tags[i]]->Fit("gaus","SQ", "", -0.0005, 0.0005);
+
       ret->SetBinContent(i+1, m_plots[mag + "_P2_" + algo + tags[i]]->GetFunction("gaus")->GetParameter(2));
     }
   }
@@ -347,10 +350,10 @@ void DTNtupleTPGSimAnalyzer::endJob()
   std::vector<std::string> whTags    = { "Wh.-2", "Wh.-1", "Wh.0", "Wh.+1", "Wh.+2"};
   std::vector<std::string> secTags   = { "Sec.1", "Sec.2", "Sec.3", "Sec.4", "Sec.5", "Sec.6", "Sec.7", "Sec.8","Sec.9","Sec.10","Sec.11","Sec.12","Sec.13","Sec.14"};
   std::vector<std::string> magnitudes = { "TimeRes", "PhiRes", "TanPsiRes", "xRes"};
-  std::vector<std::string> algos      = { "AM", "HB" };
+  std::vector<std::string> algotag    = { "AM", "HB" };
   for (const auto & mag : magnitudes)
   {
-    for (const auto & algo : algos)
+    for (const auto & algo : algotag)
     {
       m_plots[mag + "_" + algo + "_Res_perChamb"] = makeHistoPer( mag, "_Res_perChamb", chambTags, algo);
       m_plots[mag + "_" + algo + "_Res_perWheel"] = makeHistoPer( mag, "_Res_perWheel", whTags   , algo);
