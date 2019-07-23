@@ -30,9 +30,9 @@ cmsRun dtDpgNtuples_phase2_cfg.py nEvents=10000
 root -b
 root [0] .x loadTPGSimAnalysis.C
 
-root [1] DTNtupleTPGSimAnalyzer_Resolution analysis("DTDPGNtuple_10_6_0_SX5.root","results.root")
+root [1] DTNtupleTPGSimAnalyzer analysis("DTDPGNtuple_10_6_0_SX5.root","results.root")
 // or
-root [1] DTNtupleTPGSimAnalyzer_Resolution analysis("DTDPGNtuple_10_6_0_Phase2_Simulation.root","results.root")
+root [1] DTNtupleTPGSimAnalyzer analysis("DTDPGNtuple_10_6_0_Phase2_Simulation.root","results.root")
 
 root [2] analysis.Loop()
 ```
