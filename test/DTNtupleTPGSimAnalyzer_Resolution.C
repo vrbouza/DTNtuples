@@ -72,7 +72,7 @@ void DTNtupleTPGSimAnalyzer::book()
     for (const auto & qual : qualTags)
     {
       Double_t limtanpsi   = 0.1; Double_t limphi   = 0.005; Double_t limtime  = 50;   Double_t limx   = 0.2;
-      UShort_t nbinstanpsi = 101; UShort_t nbinsphi = 101;   UShort_t nbinstime = 50; UShort_t nbinsx = 101;
+      UShort_t nbinstanpsi = 101; UShort_t nbinsphi = 101;   UShort_t nbinstime = 101; UShort_t nbinsx = 101;
       m_plots["TanPsiRes_P2" + algo + "_" + qual] = new TH1F(("hTanPsiRes_P2"+ algo + "_" + qual).c_str() ,
             "TanPsiRes Seg-TP total distribution; #Delta tan(#psi) (adim.); entries",
             nbinstanpsi,-limtanpsi,+limtanpsi);
@@ -230,7 +230,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           // Time
           if (seg_phi_t0->at(iSeg) > -500)
           {
-            Short_t segLocalHBDtime = ((Short_t) (seg_phi_t0->at(iSeg) / 10 )) - (ph2TpgPhiEmuHb_BX->at(bestTPHB) - 20);
+            Short_t segLocalHBDtime = ((Short_t) (seg_phi_t0->at(iSeg) / 10 )) - (ph2TpgPhiEmuHb_BX->at(bestTPHB)) * 25;
 
             m_plots["TimeRes_P2_HB_" + corr]           ->Fill( segLocalHBDtime );
             m_plots["TimeRes_P2_HB_" + corr + whTag]   ->Fill( segLocalHBDtime );
