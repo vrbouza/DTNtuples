@@ -71,8 +71,8 @@ void DTNtupleTPGSimAnalyzer::book()
     {
       for (const auto & total : totalTag)
       {
-      m_plots["Eff" + "_" + chamb + "_" + algo + "_" + total] = new TH1D(("hEff" + "_" + chamb + "_" + algo + "_" + total).c_str(),
-                                                ("Efficiency for " + chambTag + " " + algo + " " + age + "; Sector; efficiency").c_str(),
+      m_plots["Eff_" + chamb + "_" + algo + "_" + total] = new TH1D(("hEff_" + chamb + "_" + algo + "_" + total).c_str(),
+                                                ("Efficiency for " + chamb + " " + algo + "; Sector; efficiency").c_str(),
                                                 5, -2.5, +2.5);
       }
     }
@@ -155,49 +155,51 @@ void DTNtupleTPGSimAnalyzer::fill()
 
       if (bestTPHB > -1)
       {
-        m_plots["Eff" + "_" + chambTag + "_" + "HB" + "_" + "selected"]->Fill(segWh);
-        m_plots["Eff" + "_" + chambTag + "_" + "HB" + "_" + "total"]->Fill(segWh);
+        m_plots["Eff_" + chambTag + "_HB_matched"]->Fill(segWh);
+        m_plots["Eff_" + chambTag + "_HB_total"]->Fill(segWh);
       }
       else
       {
-        m_plots["Eff" + "_" + chambTag + "_" + "HB" + "_" + "total"]->Fill(segWh);
+        m_plots["Eff_" + chambTag + "_HB_total"]->Fill(segWh);
       }
 
 
       // ==================== VARIABLES FOR THE ANALYTICAL METHOD ALGORITHM
       Int_t    bestTPAM = -1;
+      Int_t    AMRPCflag= -1;
       Double_t bestSegTrigAMDPhi = 1000;
       Double_t bestAMDPhi = 0;
-      for (std::size_t iTrigAM = 0; iTrigAM < ph2TpgPhiEmuAm_nTrigs; ++iTrigAM){
+      for (std::size_t iTrigAM = 0; iTrigAM < ph2TpgPhiEmuAm_nTrigs; ++iTrigAM)
+      {
         Int_t trigAMWh  = ph2TpgPhiEmuAm_wheel->at(iTrigAM);
         Int_t trigAMSec = ph2TpgPhiEmuAm_sector->at(iTrigAM);
         Int_t trigAMSt  = ph2TpgPhiEmuAm_station->at(iTrigAM);
         Int_t trigAMBX  = ph2TpgPhiEmuAm_BX->at(iTrigAM);
 
-        if (segWh  == trigAMWh && segSec == trigAMSec &&  segSt  == trigAMSt){
+        if (segWh == trigAMWh && segSec == trigAMSec && segSt  == trigAMSt)
+        {
           Double_t trigGlbPhi    = trigPhiInRad(ph2TpgPhiEmuAm_phi->at(iTrigAM),trigAMSec);
           Double_t finalAMDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
-          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+//           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
           {
             bestTPAM          = iTrigAM;
             bestSegTrigAMDPhi = segTrigAMDPhi;
             bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
+            AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
           }
         }
       }
 
       if (bestTPAM > -1)
       {
-        m_plots["Eff" + "_" + chambTag + "_" + "AM" + "_" + "selected"]->Fill(segWh);
-        if (ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM) > 0)
-        {
-          m_plots["Eff" + "_" + chambTag + "_" + "AM+RPC" + "_" + "selected"]->Fill(segWh);
-        }
+        m_plots["Eff_" + chambTag + "_AM_matched"]->Fill(segWh);
+        if (AMRPCflag > 0) m_plots["Eff_" + chambTag + "_AM+RPC_matched"]->Fill(segWh);
       }
-      m_plots["Eff" + "_" + chambTag + "_" + "AM" + "_" + "total"]->Fill(segWh);
-      m_plots["Eff" + "_" + chambTag + "_" + "AM+RPC" + "_" + "total"]->Fill(segWh);
+      m_plots["Eff_" + chambTag + "_AM_total"]->Fill(segWh);
+      m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
     }
   }
 }
