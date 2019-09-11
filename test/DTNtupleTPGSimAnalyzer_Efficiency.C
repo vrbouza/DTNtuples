@@ -131,6 +131,7 @@ void DTNtupleTPGSimAnalyzer::fill()
       Int_t    bestTPHB = -1;
       Double_t bestSegTrigHBDPhi = 1000;
       Double_t bestHBDPhi = 0;
+      Int_t    besttrigHBBX = 0;
       for (std::size_t iTrigHB = 0; iTrigHB < ph2TpgPhiEmuHb_nTrigs; ++iTrigHB)
       {
         Int_t trigHBWh  = ph2TpgPhiEmuHb_wheel->at(iTrigHB);
@@ -147,18 +148,19 @@ void DTNtupleTPGSimAnalyzer::fill()
           if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi))
           {
             bestTPHB          = iTrigHB;
+            besttrigHBBX      = trigHBBX;
             bestSegTrigHBDPhi = segTrigHBDPhi;
             bestHBDPhi        = TVector2::Phi_mpi_pi(finalHBDPhi);
           }
         }
       }
 
-      if (bestTPHB > -1)
+      if (bestTPHB > -1 && seg_phi_t0->at(iSeg) > -500)
       {
         m_plots["Eff_" + chambTag + "_HB_matched"]->Fill(segWh);
-        m_plots["Eff_" + chambTag + "_HB_total"]->Fill(segWh);
       }
-      else
+
+      if (seg_phi_t0->at(iSeg) > -500)
       {
         m_plots["Eff_" + chambTag + "_HB_total"]->Fill(segWh);
       }
@@ -169,6 +171,7 @@ void DTNtupleTPGSimAnalyzer::fill()
       Int_t    AMRPCflag= -1;
       Double_t bestSegTrigAMDPhi = 1000;
       Double_t bestAMDPhi = 0;
+      Int_t    besttrigAMBX = 0;
       for (std::size_t iTrigAM = 0; iTrigAM < ph2TpgPhiEmuAm_nTrigs; ++iTrigAM)
       {
         Int_t trigAMWh  = ph2TpgPhiEmuAm_wheel->at(iTrigAM);
@@ -182,10 +185,11 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalAMDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
-//           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi))
-          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+//           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
           {
             bestTPAM          = iTrigAM;
+            besttrigAMBX      = trigAMBX;
             bestSegTrigAMDPhi = segTrigAMDPhi;
             bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
             AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
@@ -193,13 +197,33 @@ void DTNtupleTPGSimAnalyzer::fill()
         }
       }
 
-      if (bestTPAM > -1)
+      if (bestTPAM > -1 && seg_phi_t0->at(iSeg) > -500)
       {
         m_plots["Eff_" + chambTag + "_AM_matched"]->Fill(segWh);
         if (AMRPCflag > 0) m_plots["Eff_" + chambTag + "_AM+RPC_matched"]->Fill(segWh);
       }
-      m_plots["Eff_" + chambTag + "_AM_total"]->Fill(segWh);
-      m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
+
+      if (seg_phi_t0->at(iSeg) > -500)
+      {
+        m_plots["Eff_" + chambTag + "_AM_total"]->Fill(segWh);
+        m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
+      }
+//       if (iSeg == 0)
+//       {
+//         for (std::size_t iTrigAM = 0; iTrigAM < ph2TpgPhiEmuAm_nTrigs; ++iTrigAM)
+//         {
+//           Int_t trigAMWh  = ph2TpgPhiEmuAm_wheel->at(iTrigAM);
+//           Int_t trigAMSt  = ph2TpgPhiEmuAm_station->at(iTrigAM);
+//           Int_t trigAMBX  = ph2TpgPhiEmuAm_BX->at(iTrigAM);
+//           chambTag = chambTags.at(trigAMSt - 1);
+//           if (trigAMBX > 5)
+//           {
+//             m_plots["Eff_" + chambTag + "_AM_total"]->Fill(trigAMWh);
+//             m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(trigAMWh);
+//           }
+//         }
+//       }
+
     }
   }
 }
