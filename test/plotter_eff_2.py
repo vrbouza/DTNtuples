@@ -4,30 +4,24 @@ from copy import deepcopy
 import CMS_lumi
 r.gROOT.SetBatch(True)
 
-path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_shiftsoff/"
+path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_shiftsoff_qualities/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}"
 chambTag = ["MB1", "MB2", "MB3", "MB4"]
 
 
-def makeresplot(hlist, aged, algo, pued = False):
+def makeresplot(hlist, aged, algo, pued = False, typ=""):
     print "Obtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
-    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age.root")
+    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age" + typ  +".root")
     hmatched = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "matched")) for ich in range(4)]
     htotal   = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "total")) for ich in range(4)]
 
-    resplot = r.TH1F("hEff_{al}_{ag}_{pu}".format(al = algo, ag = (not aged) * "no" + "age", pu = ((not pued) * "no") + "pu"), "", 20, -0.5, 19.5)
-    
+    resplot = r.TH1F("hEff_{al}_{ag}_{pu}{typ}".format(typ=typ,al = algo, ag = (not aged) * "no" + "age", pu = ((not pued) * "no") + "pu"), "", 20, -0.5, 19.5)
+
     ibin = 1
     for ich in range(4):
         for iwh in range(1, 6):
             resplot.SetBinContent(ibin, hmatched[ich].GetBinContent(iwh) / htotal[ich].GetBinContent(iwh))
-            eff = r.TEfficiency('kk','',1,-0.5,0.5)
-            eff.SetTotalEvents(1, int(htotal[ich].GetBinContent(iwh)))
-            eff.SetPassedEvents(1,int(hmatched[ich].GetBinContent(iwh)))
-            if (eff.GetEfficiencyErrorLow(1)-eff.GetEfficiencyErrorUp(1)) > 0.05: print 'warning, bin asymmetric'
-            resplot.SetBinError( ibin, max(eff.GetEfficiencyErrorLow(1),eff.GetEfficiencyErrorUp(1)))
-            del eff
             ibin += 1
 
     hlist.append(deepcopy(resplot))
@@ -42,25 +36,22 @@ yaxistitle     = "Efficiency (adim.)"
 yaxistitleoffset= 1.5
 xaxistitle     = "Wheel"
 legxlow        = 0.3075 + 2 * 0.1975
-legylow        = 0.3
+legylow        = 0.7
 legxhigh       = 0.9
-legyhigh       = 0.5
+legyhigh       = 0.9
 
 markertypedir  = {}
 markertypedir["AM_age"] = 20
 markertypedir["AM_noage"] = 20
-#markertypedir["AM+RPC_age"] = 29
-#markertypedir["AM+RPC_noage"] = 29
-markertypedir["AM+RPC_age"] = 34
-markertypedir["AM+RPC_noage"] = 34
-markertypedir["HB_noage"] = 22
+markertypedir["AM_agenothreehits"] = 34
+markertypedir["AM_noagenothreehits"] = 34
 
 markercolordir  = {}
-markercolordir["AM_age"] = r.kRed
-markercolordir["AM+RPC_age"] = r.kRed
-markercolordir["AM+RPC_noage"] = r.kBlue
-markercolordir["HB_noage"] = r.kBlue
+markercolordir["AM_age"]   = r.kRed
 markercolordir["AM_noage"] = r.kBlue
+markercolordir["AM_agenothreehits"]   = r.kRed 
+markercolordir["AM_noagenothreehits"] = r.kBlue
+
 
 def combineresplots(hlist, pued = False):
     print "Combining list of plots that has", pued, "pile-up"
@@ -87,7 +78,7 @@ def combineresplots(hlist, pued = False):
         hlist[iplot].SetMarkerStyle(markertypedir[hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_","")])
         hlist[iplot].SetMarkerColor(markercolordir[hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_","")])
         leg.AddEntry(hlist[iplot], hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_",""), "P")
-        hlist[iplot].Draw("P,hist" + (iplot != 0) * "same")
+        hlist[iplot].Draw("P0" + (iplot != 0) * "same")
 
     leg.Draw()
 
@@ -125,20 +116,16 @@ def combineresplots(hlist, pued = False):
 print "\nBeginning plotting\n"
 listofplots     = []
 puedlistofplots = []
-makeresplot(listofplots, False, "AM", False)
-makeresplot(listofplots, True,  "AM", False)
-makeresplot(listofplots, False, "HB", False)
-makeresplot(listofplots, False, "AM+RPC", False)
-makeresplot(listofplots, True,  "AM+RPC", False)
 
-#for bin in range(1, listofplots[-1].GetNbinsX() + 1):
-    #print "bin", bin, "contenido", listofplots[-1].GetBinContent(bin)
+makeresplot(puedlistofplots, False, "AM", True , '')
+makeresplot(puedlistofplots, True,  "AM", True , '')
+makeresplot(listofplots, False, "AM", False, '')
+makeresplot(listofplots, True,  "AM", False, '')
+makeresplot(puedlistofplots, False, "AM", True , 'nothreehits')
+makeresplot(puedlistofplots, True,  "AM", True , 'nothreehits')
+makeresplot(listofplots, False, "AM", False, 'nothreehits')
+makeresplot(listofplots, True,  "AM", False, 'nothreehits')
 
-makeresplot(puedlistofplots, False, "AM", True)
-makeresplot(puedlistofplots, True,  "AM", True)
-makeresplot(puedlistofplots, False, "HB", True)
-makeresplot(puedlistofplots, False, "AM+RPC", True)
-makeresplot(puedlistofplots, True,  "AM+RPC", True)
 
 print "\nCombining and saving\n"
 combineresplots(listofplots)
