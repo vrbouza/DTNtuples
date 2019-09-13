@@ -21,7 +21,8 @@ class DTNtupleTPGSimAnalyzer : public DTNtupleBaseAnalyzer
 public:
   
   DTNtupleTPGSimAnalyzer(const TString & inFileName,
-			 const TString & outFileName);
+			 const TString & outFileName,
+			 const TString & quality);
   ~DTNtupleTPGSimAnalyzer();
 
   void virtual Loop() override;
@@ -31,6 +32,7 @@ protected:
   void book();
   void fill();
   void endJob();
+  const TString quality_;
 
 private:
   
