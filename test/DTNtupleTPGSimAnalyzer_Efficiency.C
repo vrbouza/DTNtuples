@@ -127,6 +127,10 @@ void DTNtupleTPGSimAnalyzer::fill()
         bestSegIndex[segSt - 1] = iSeg;
       }
     }
+
+    int minQuality = -99;
+    if (quality_ == "nothreehits")
+      minQuality = 3;
     
 
     // ==================== VARIABLES FOR THE HOUGH TRANSFORM BASED ALGORITHM
@@ -159,7 +163,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalHBDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigHBDPhi = abs(acos(cos(finalHBDPhi)));
 
-          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi))
+          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi) && (ph2TpgPhiEmuHb_quality->at(iTrigHB) >= minQuality))
           {
             bestTPHB          = iTrigHB;
             besttrigHBBX      = trigHBBX;
@@ -199,9 +203,6 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalAMDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
-	  int minQuality = -99;
-	  if (quality_ == "nothreehits")
-	    minQuality = 3;
 
           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi) && (ph2TpgPhiEmuAm_quality->at(iTrigAM) >= minQuality))
 //           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))

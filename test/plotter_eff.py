@@ -8,11 +8,11 @@ path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_shiftsoff/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}"
 chambTag = ["MB1", "MB2", "MB3", "MB4"]
-
+suffix = "nothreehits"
 
 def makeresplot(hlist, aged, algo, pued = False):
     print "Obtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
-    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age.root")
+    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age" + suffix + ".root")
     hmatched = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "matched")) for ich in range(4)]
     htotal   = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "total")) for ich in range(4)]
 
@@ -54,6 +54,7 @@ markertypedir["AM_noage"] = 20
 markertypedir["AM+RPC_age"] = 34
 markertypedir["AM+RPC_noage"] = 34
 markertypedir["HB_noage"] = 22
+markertypedir["HB_age"] = 22
 
 markercolordir  = {}
 markercolordir["AM_age"] = r.kRed
@@ -61,6 +62,7 @@ markercolordir["AM+RPC_age"] = r.kRed
 markercolordir["AM+RPC_noage"] = r.kBlue
 markercolordir["HB_noage"] = r.kBlue
 markercolordir["AM_noage"] = r.kBlue
+markercolordir["HB_age"] = r.kRed
 
 def combineresplots(hlist, pued = False):
     print "Combining list of plots that has", pued, "pile-up"
@@ -128,6 +130,7 @@ puedlistofplots = []
 makeresplot(listofplots, False, "AM", False)
 makeresplot(listofplots, True,  "AM", False)
 makeresplot(listofplots, False, "HB", False)
+#makeresplot(listofplots, True, "HB", False)
 makeresplot(listofplots, False, "AM+RPC", False)
 makeresplot(listofplots, True,  "AM+RPC", False)
 
@@ -137,6 +140,7 @@ makeresplot(listofplots, True,  "AM+RPC", False)
 makeresplot(puedlistofplots, False, "AM", True)
 makeresplot(puedlistofplots, True,  "AM", True)
 makeresplot(puedlistofplots, False, "HB", True)
+#makeresplot(puedlistofplots, True , "HB", True)
 makeresplot(puedlistofplots, False, "AM+RPC", True)
 makeresplot(puedlistofplots, True,  "AM+RPC", True)
 
