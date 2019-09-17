@@ -140,6 +140,8 @@ void DTNtupleTPGSimAnalyzer::fill()
 
       Int_t segWh  = seg_wheel->at(iSeg);
       Int_t segSec = seg_sector->at(iSeg);
+      if (segSec == 13) segSec = 4;
+      if (segSec == 14) segSec = 10;
       Int_t segSt  = seg_station->at(iSeg);
       
       std::string chambTag = chambTags.at(segSt - 1);
