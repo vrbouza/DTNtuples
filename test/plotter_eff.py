@@ -4,11 +4,11 @@ from copy import deepcopy
 import CMS_lumi
 r.gROOT.SetBatch(True)
 
-path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_shiftsoff/"
+path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}"
 chambTag = ["MB1", "MB2", "MB3", "MB4"]
-suffix = "nothreehits"
+suffix = ""
 
 def makeresplot(hlist, aged, algo, pued = False):
     print "Obtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
@@ -130,7 +130,7 @@ puedlistofplots = []
 makeresplot(listofplots, False, "AM", False)
 makeresplot(listofplots, True,  "AM", False)
 makeresplot(listofplots, False, "HB", False)
-#makeresplot(listofplots, True, "HB", False)
+makeresplot(listofplots, True, "HB", False)
 makeresplot(listofplots, False, "AM+RPC", False)
 makeresplot(listofplots, True,  "AM+RPC", False)
 
@@ -140,7 +140,7 @@ makeresplot(listofplots, True,  "AM+RPC", False)
 makeresplot(puedlistofplots, False, "AM", True)
 makeresplot(puedlistofplots, True,  "AM", True)
 makeresplot(puedlistofplots, False, "HB", True)
-#makeresplot(puedlistofplots, True , "HB", True)
+makeresplot(puedlistofplots, True , "HB", True)
 makeresplot(puedlistofplots, False, "AM+RPC", True)
 makeresplot(puedlistofplots, True,  "AM+RPC", True)
 
