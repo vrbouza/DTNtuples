@@ -2,9 +2,23 @@
 #include "TVector2.h"
 #include "TF1.h"
 
+// 1,2 -> 3 hits
+// 3,4 -> 4 hits
+// 5 -> 3+2
+// 6 -> 3+3
+// 7 -> 4+2
+// 8 -> 4+3
+// 9 -> 4+4
+
+
+
+
+
 DTNtupleTPGSimAnalyzer::DTNtupleTPGSimAnalyzer(const TString & inFileName,
-                                               const TString & outFileName):
-  m_outFile(outFileName,"RECREATE"), DTNtupleBaseAnalyzer(inFileName)
+                                               const TString & outFileName,
+					       const TString & quality = ""
+					       ):
+  m_outFile(outFileName,"RECREATE"), DTNtupleBaseAnalyzer(inFileName), quality_(quality)
 {
 
   m_minMuPt = 20;
@@ -113,6 +127,10 @@ void DTNtupleTPGSimAnalyzer::fill()
         bestSegIndex[segSt - 1] = iSeg;
       }
     }
+
+    int minQuality = -99;
+    if (quality_ == "nothreehits")
+      minQuality = 3;
     
 
     // ==================== VARIABLES FOR THE HOUGH TRANSFORM BASED ALGORITHM
@@ -122,6 +140,8 @@ void DTNtupleTPGSimAnalyzer::fill()
 
       Int_t segWh  = seg_wheel->at(iSeg);
       Int_t segSec = seg_sector->at(iSeg);
+      if (segSec == 13) segSec = 4;
+      if (segSec == 14) segSec = 10;
       Int_t segSt  = seg_station->at(iSeg);
       
       std::string chambTag = chambTags.at(segSt - 1);
@@ -145,7 +165,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalHBDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigHBDPhi = abs(acos(cos(finalHBDPhi)));
 
-          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi))
+          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi) && (ph2TpgPhiEmuHb_quality->at(iTrigHB) >= minQuality))
           {
             bestTPHB          = iTrigHB;
             besttrigHBBX      = trigHBBX;
@@ -185,7 +205,8 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalAMDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
-          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+
+          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi) && (ph2TpgPhiEmuAm_quality->at(iTrigAM) >= minQuality))
 //           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
           {
             bestTPAM          = iTrigAM;
