@@ -4,23 +4,32 @@ from copy import deepcopy
 import CMS_lumi
 r.gROOT.SetBatch(True)
 
-path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
+#path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
+path = "~vrbouza/www/Miscelánea/2019_09_18_plots_eff_shiftsoff/"
+
 plotscaffold = "hEff_{st}_{al}_{ty}"
-savescaffold = "hEff_{pu}"
+savescaffold = "hEff_{pu}{qu}{id}"
 chambTag = ["MB1", "MB2", "MB3", "MB4"]
 suffix = ""
 
-def makeresplot(hlist, aged, algo, pued = False):
-    print "Obtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
-    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age" + suffix + ".root")
-    hmatched = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "matched")) for ich in range(4)]
-    htotal   = [res.Get(plotscaffold.format(al = algo, st = chambTag[ich], ty = "total")) for ich in range(4)]
+def makeresplot(hlist, aged, algo, qual = "", pued = False, ind = ""):
+    print "\nObtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
+    print "The file that it's going to be opened is", "results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + ind + suffix + ".root"
+    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + ind + suffix + ".root")
 
-    resplot = r.TH1F("hEff_{al}_{ag}_{pu}".format(al = algo, ag = (not aged) * "no" + "age", pu = ((not pued) * "no") + "pu"), "", 20, -0.5, 19.5)
+    print "Then, we're gonna get the histograms labeled as follows:", plotscaffold.format(al = algo.replace("+RPC", ""), st = chambTag[0], ty = "matched")
+
+    hmatched = [res.Get(plotscaffold.format(al = algo.replace("+RPC", ""), st = chambTag[ich], ty = "matched")) for ich in range(4)]
+    htotal   = [res.Get(plotscaffold.format(al = algo.replace("+RPC", ""), st = chambTag[ich], ty = "total")) for ich in range(4)]
+
+    print "And finally the histogram that is going to be saved will have this name:", "hEff_{al}_{ag}_{pu}".format(al = algo, ag = (not aged) * "no" + "age", pu = ((not pued) * "no") + "pu") + "_{q}".format(q = qual) * (qual != "") + "_{id}".format(id = ind)* (ind != "")
+
+    resplot = r.TH1F("hEff_{al}_{ag}_{pu}".format(al = algo, ag = (not aged) * "no" + "age", pu = ((not pued) * "no") + "pu") + "_{q}".format(q = qual) * (qual != "") + "_{id}".format(id = ind)* (ind != ""), "", 20, -0.5, 19.5)
     
     ibin = 1
     for ich in range(4):
         for iwh in range(1, 6):
+            #print "st", ich, "wh", iwh, "valmatched:", hmatched[ich].GetBinContent(iwh), "valtotal:", htotal[ich].GetBinContent(iwh)
             resplot.SetBinContent(ibin, hmatched[ich].GetBinContent(iwh) / htotal[ich].GetBinContent(iwh))
             eff = r.TEfficiency('kk','',1,-0.5,0.5)
             eff.SetTotalEvents(1, int(htotal[ich].GetBinContent(iwh)))
@@ -35,7 +44,7 @@ def makeresplot(hlist, aged, algo, pued = False):
     return
 
 
-lowlimityaxis  = 0.4
+lowlimityaxis  = 0.6
 highlimityaxis = 1
 markersize     = 1
 yaxistitle     = "Efficiency (adim.)"
@@ -64,8 +73,8 @@ markercolordir["HB_noage"] = r.kBlue
 markercolordir["AM_noage"] = r.kBlue
 markercolordir["HB_age"] = r.kRed
 
-def combineresplots(hlist, pued = False):
-    print "Combining list of plots that has", pued, "pile-up"
+def combineresplots(hlist, qual = "", pued = False, ind = ""):
+    print "Combining list of plots that has", pued, "pile-up,", qual, "quality and", ind, "index."
     if len(hlist) == 0: raise RuntimeError("Empty list of plots")
     c   = r.TCanvas("c", "c", 800, 800)
     c.SetLeftMargin(0.11)
@@ -85,10 +94,10 @@ def combineresplots(hlist, pued = False):
             ilabel += 1
 
     for iplot in range(len(hlist)):
-        hlist[iplot].SetMarkerSize(markersize)
-        hlist[iplot].SetMarkerStyle(markertypedir[hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_","")])
-        hlist[iplot].SetMarkerColor(markercolordir[hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_","")])
-        leg.AddEntry(hlist[iplot], hlist[iplot].GetName().replace("_nopu","").replace("_pu","").replace("hEff_",""), "P")
+        hlist[iplot].SetMarkerSize(markersize)    # .replace("_nopu","").replace("_pu","").replace("hEff_","")
+        hlist[iplot].SetMarkerStyle(markertypedir[( hlist[iplot].GetName().split("_")[1] + "_" + hlist[iplot].GetName().split("_")[2] )])
+        hlist[iplot].SetMarkerColor(markercolordir[hlist[iplot].GetName().split("_")[1] + "_" + hlist[iplot].GetName().split("_")[2]])
+        leg.AddEntry(hlist[iplot], hlist[iplot].GetName().split("_")[1] + " " + hlist[iplot].GetName().split("_")[2], "P")
         hlist[iplot].Draw("P,hist" + (iplot != 0) * "same")
 
     leg.Draw()
@@ -117,33 +126,43 @@ def combineresplots(hlist, pued = False):
 
 
     #c.SetLogy()
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu") + ".png")
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu") + ".pdf")
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu") + ".root")
+    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".png")
+    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".pdf")
+    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".root")
     c.Close(); del c
     return
 
 
-print "\nBeginning plotting\n"
-listofplots     = []
-puedlistofplots = []
-makeresplot(listofplots, False, "AM", False)
-makeresplot(listofplots, True,  "AM", False)
-makeresplot(listofplots, False, "HB", False)
-makeresplot(listofplots, True, "HB", False)
-makeresplot(listofplots, False, "AM+RPC", False)
-makeresplot(listofplots, True,  "AM+RPC", False)
+def producetheTDRplot(qual = "", pu = False, ind = ""):
+    print "\nBeginning plotting for pu", pu, "\n"
+    listofplots = []
+    makeresplot(listofplots, False, "AM",     qual, pu, ind)
+    makeresplot(listofplots, True,  "AM",     qual, pu, ind)
+    makeresplot(listofplots, False, "HB",     qual, pu, ind)
+    makeresplot(listofplots, True,  "HB",     qual, pu, ind)
+    makeresplot(listofplots, False, "AM+RPC", qual, pu, ind)
+    makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind)
 
-#for bin in range(1, listofplots[-1].GetNbinsX() + 1):
-    #print "bin", bin, "contenido", listofplots[-1].GetBinContent(bin)
+    print "\nCombining and saving\n"
+    combineresplots(listofplots, qual, pu, ind)
 
-makeresplot(puedlistofplots, False, "AM", True)
-makeresplot(puedlistofplots, True,  "AM", True)
-makeresplot(puedlistofplots, False, "HB", True)
-makeresplot(puedlistofplots, True , "HB", True)
-makeresplot(puedlistofplots, False, "AM+RPC", True)
-makeresplot(puedlistofplots, True,  "AM+RPC", True)
 
-print "\nCombining and saving\n"
-combineresplots(listofplots)
-combineresplots(puedlistofplots, True)
+#def producetheSilviaplots():
+    #print "\nBeginning plotting for pu", pu, "\n"
+    #listofplots = []
+    #makeresplot(listofplots, False, "AM",     pu)
+    #makeresplot(listofplots, True,  "AM",     pu)
+    #makeresplot(listofplots, False, "HB",     pu)
+    #makeresplot(listofplots, True,  "HB",     pu)
+    #makeresplot(listofplots, False, "AM+RPC", pu)
+    #makeresplot(listofplots, True,  "AM+RPC", pu)
+
+    #print "\nCombining and saving\n"
+    #combineresplots(listofplots, pu)
+
+
+#### ACTUAL EXECUTION AND SMALL NICE CODE
+producetheTDRplot("")
+producetheTDRplot("", True)
+producetheTDRplot("nothreehits")
+producetheTDRplot("nothreehits", True)
