@@ -131,10 +131,23 @@ void DTNtupleTPGSimAnalyzer::fill()
 
     Int_t minQualityAM = -99;
     Int_t minQualityHB = -99;
+    std::vector<Int_t> vetoedqualitiesAM; vetoedqualitiesAM.clear();
     if (quality_ == "nothreehits")
     {
       minQualityAM = 3;
       minQualityHB = 4;
+    }
+    else if (quality_ == "higherthanfour")
+    {
+      minQualityAM = 5;
+      minQualityHB = 5;
+    }
+    else if (quality_ == "higherthanfourvetoing")
+    {
+      minQualityAM = 5;
+      minQualityHB = 5;
+      vetoedqualitiesAM.push_back(5);
+      vetoedqualitiesAM.push_back(7);
     }
     
 
@@ -211,14 +224,30 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi) && (ph2TpgPhiEmuAm_quality->at(iTrigAM) >= minQualityAM) && (((ph2TpgPhiEmuAm_index->at(iTrigAM) < maxindex_) && (index_ < 0)) || ((ph2TpgPhiEmuAm_index->at(iTrigAM) == index_) && (index_ >= 0))))
-//           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
           {
-//             cout << "WOLOLO" << endl;
-            bestTPAM          = iTrigAM;
-            besttrigAMBX      = trigAMBX;
-            bestSegTrigAMDPhi = segTrigAMDPhi;
-            bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
-            AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+            if (vetoedqualitiesAM.size() == 0)
+            {
+              bestTPAM          = iTrigAM;
+              besttrigAMBX      = trigAMBX;
+              bestSegTrigAMDPhi = segTrigAMDPhi;
+              bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
+              AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+            }
+            else
+            {
+              Bool_t vetoed = false;
+              for (UInt_t i = 0; i < vetoedqualitiesAM.size(); i++)
+              {
+                if (ph2TpgPhiEmuAm_quality->at(iTrigAM) == vetoedqualitiesAM.at(i)) vetoed = true;
+              }
+              if (! vetoed) {
+                bestTPAM          = iTrigAM;
+                besttrigAMBX      = trigAMBX;
+                bestSegTrigAMDPhi = segTrigAMDPhi;
+                bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
+                AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+              }
+            }
           }
         }
       }

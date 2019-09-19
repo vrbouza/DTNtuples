@@ -15,7 +15,7 @@ suffix = ""
 def makeresplot(hlist, aged, algo, qual = "", pued = False, ind = ""):
     print "\nObtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
     print "The file that it's going to be opened is", "results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + ind + suffix + ".root"
-    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + ind + suffix + ".root")
+    res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_{q}".format(q = qual) + "_{id}".format(id = ind) * (ind != "") + suffix + ".root")
 
     print "Then, we're gonna get the histograms labeled as follows:", plotscaffold.format(al = algo.replace("+RPC", ""), st = chambTag[0], ty = "matched")
 
@@ -147,18 +147,15 @@ def producetheTDRplot(qual = "", pu = False, ind = ""):
     combineresplots(listofplots, qual, pu, ind)
 
 
-#def producetheSilviaplots():
-    #print "\nBeginning plotting for pu", pu, "\n"
-    #listofplots = []
-    #makeresplot(listofplots, False, "AM",     pu)
-    #makeresplot(listofplots, True,  "AM",     pu)
-    #makeresplot(listofplots, False, "HB",     pu)
-    #makeresplot(listofplots, True,  "HB",     pu)
-    #makeresplot(listofplots, False, "AM+RPC", pu)
-    #makeresplot(listofplots, True,  "AM+RPC", pu)
-
-    #print "\nCombining and saving\n"
-    #combineresplots(listofplots, pu)
+def producetheSilviaplots():
+    producetheTDRplot("", False, "ind0")
+    producetheTDRplot("", True,  "ind0")
+    producetheTDRplot("", False, "indmax2")
+    producetheTDRplot("", True,  "indmax2")
+    producetheTDRplot("higherthanfour", False)
+    producetheTDRplot("higherthanfour", True)
+    producetheTDRplot("higherthanfourvetoing", False)
+    producetheTDRplot("higherthanfourvetoing", True)
 
 
 #### ACTUAL EXECUTION AND SMALL NICE CODE
@@ -166,3 +163,5 @@ producetheTDRplot("")
 producetheTDRplot("", True)
 producetheTDRplot("nothreehits")
 producetheTDRplot("nothreehits", True)
+
+producetheSilviaplots()

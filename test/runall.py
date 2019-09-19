@@ -25,12 +25,14 @@ tasks = []
 for pu in 'nopu,pu'.split(','):
     for age in 'age,noage'.split(','):
         for rpc in "withrpc,norpc".split(","):
-            for qual in ',nothreehits'.split(','):
+            #for qual in ',nothreehits,higherthanfour,higherthanfourvetoing'.split(','):
+            for qual in 'higherthanfour,higherthanfourvetoing'.split(','):
                 tasks.append( (pu, age, rpc, qual, -99, +99) )
                 if qual == "":
                     tasks.append( (pu, age, rpc, qual, 0, +99) )
                     tasks.append( (pu, age, rpc, qual, -99, 2) )
 
+#tasks.append( ("nopu", "age", "withrpc", "higherthanfourvetoing", -99, +99) )
 
 if nCores == 1:
     for task in tasks: ExecuteTheThing(task)
