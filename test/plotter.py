@@ -3,7 +3,7 @@ import ROOT as r
 
 r.gROOT.SetBatch(True)
 
-path = "~vrbouza/www/Miscelánea/2019_07_11_ejsplots/2019_07_16_pruebaplots_shifts/"
+path = "~vrbouza/www/Miscelánea/2019_09_18_plots_eff_shiftsoff/"
 
 res = r.TFile.Open('results.root')
 c = r.TCanvas()

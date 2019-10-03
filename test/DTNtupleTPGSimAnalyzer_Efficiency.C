@@ -2,6 +2,7 @@
 #include "TVector2.h"
 #include "TF1.h"
 
+// AM
 // 1,2 -> 3 hits
 // 3,4 -> 4 hits
 // 5 -> 3+2
@@ -11,14 +12,13 @@
 // 9 -> 4+4
 
 
-
-
-
 DTNtupleTPGSimAnalyzer::DTNtupleTPGSimAnalyzer(const TString & inFileName,
                                                const TString & outFileName,
-					       const TString & quality = ""
-					       ):
-  m_outFile(outFileName,"RECREATE"), DTNtupleBaseAnalyzer(inFileName), quality_(quality)
+                                               const TString & quality = "",
+                                               Int_t index = -99,
+                                               Int_t maxindex = +99
+                                              ):
+  m_outFile(outFileName,"RECREATE"), DTNtupleBaseAnalyzer(inFileName), quality_(quality), index_(index), maxindex_(maxindex)
 {
 
   m_minMuPt = 20;
@@ -57,7 +57,7 @@ void DTNtupleTPGSimAnalyzer::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEvent(jentry);   nbytes += nb;
 
-      if(jentry % 100 == 0)
+      if (jentry % 100 == 0)
   std::cout << "[DTNtupleTPGSimAnalyzer::Loop] processed : "
       << jentry << " entries\r" << std::flush;
 
@@ -75,7 +75,8 @@ void DTNtupleTPGSimAnalyzer::book()
 {
   m_outFile.cd();
 
-  std::vector<std::string> algoTag  = {"HB",      "AM", "AM+RPC"};
+//   std::vector<std::string> algoTag  = {"HB",      "AM", "AM+RPC"};
+  std::vector<std::string> algoTag  = {"HB",      "AM"};
   std::vector<std::string> totalTag = {"matched", "total"};
   std::vector<std::string> chambTag = {"MB1",     "MB2", "MB3", "MB4"};
 
@@ -128,9 +129,26 @@ void DTNtupleTPGSimAnalyzer::fill()
       }
     }
 
-    int minQuality = -99;
+    Int_t minQualityAM = -99;
+    Int_t minQualityHB = -99;
+    std::vector<Int_t> vetoedqualitiesAM; vetoedqualitiesAM.clear();
     if (quality_ == "nothreehits")
-      minQuality = 3;
+    {
+      minQualityAM = 3;
+      minQualityHB = 4;
+    }
+    else if (quality_ == "higherthanfour")
+    {
+      minQualityAM = 5;
+      minQualityHB = 5;
+    }
+    else if (quality_ == "higherthanfourvetoing")
+    {
+      minQualityAM = 5;
+      minQualityHB = 5;
+      vetoedqualitiesAM.push_back(5);
+      vetoedqualitiesAM.push_back(7);
+    }
     
 
     // ==================== VARIABLES FOR THE HOUGH TRANSFORM BASED ALGORITHM
@@ -165,7 +183,7 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalHBDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigHBDPhi = abs(acos(cos(finalHBDPhi)));
 
-          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi) && (ph2TpgPhiEmuHb_quality->at(iTrigHB) >= minQuality))
+          if ((segTrigHBDPhi < m_maxSegTrigDPhi) && (trigHBBX == 20) && (bestSegTrigHBDPhi > segTrigHBDPhi) && (ph2TpgPhiEmuHb_quality->at(iTrigHB) >= minQualityHB) && (((ph2TpgPhiEmuHb_index->at(iTrigHB) < maxindex_) && (index_ < 0)) || ((ph2TpgPhiEmuHb_index->at(iTrigHB) == index_) && (index_ >= 0))) )
           {
             bestTPHB          = iTrigHB;
             besttrigHBBX      = trigHBBX;
@@ -205,15 +223,31 @@ void DTNtupleTPGSimAnalyzer::fill()
           Double_t finalAMDPhi   = seg_posGlb_phi->at(iSeg) - trigGlbPhi;
           Double_t segTrigAMDPhi = abs(acos(cos(finalAMDPhi)));
 
-
-          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi) && (ph2TpgPhiEmuAm_quality->at(iTrigAM) >= minQuality))
-//           if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 0) && (bestSegTrigAMDPhi > segTrigAMDPhi))
+          if ((segTrigAMDPhi < m_maxSegTrigDPhi) && (trigAMBX == 20) && (bestSegTrigAMDPhi > segTrigAMDPhi) && (ph2TpgPhiEmuAm_quality->at(iTrigAM) >= minQualityAM) && (((ph2TpgPhiEmuAm_index->at(iTrigAM) < maxindex_) && (index_ < 0)) || ((ph2TpgPhiEmuAm_index->at(iTrigAM) == index_) && (index_ >= 0))))
           {
-            bestTPAM          = iTrigAM;
-            besttrigAMBX      = trigAMBX;
-            bestSegTrigAMDPhi = segTrigAMDPhi;
-            bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
-            AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+            if (vetoedqualitiesAM.size() == 0)
+            {
+              bestTPAM          = iTrigAM;
+              besttrigAMBX      = trigAMBX;
+              bestSegTrigAMDPhi = segTrigAMDPhi;
+              bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
+              AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+            }
+            else
+            {
+              Bool_t vetoed = false;
+              for (UInt_t i = 0; i < vetoedqualitiesAM.size(); i++)
+              {
+                if (ph2TpgPhiEmuAm_quality->at(iTrigAM) == vetoedqualitiesAM.at(i)) vetoed = true;
+              }
+              if (! vetoed) {
+                bestTPAM          = iTrigAM;
+                besttrigAMBX      = trigAMBX;
+                bestSegTrigAMDPhi = segTrigAMDPhi;
+                bestAMDPhi        = TVector2::Phi_mpi_pi(finalAMDPhi);
+                AMRPCflag         = ph2TpgPhiEmuAm_rpcFlag->at(iTrigAM);
+              }
+            }
           }
         }
       }
@@ -221,13 +255,13 @@ void DTNtupleTPGSimAnalyzer::fill()
       if (bestTPAM > -1 && seg_phi_t0->at(iSeg) > -500)
       {
         m_plots["Eff_" + chambTag + "_AM_matched"]->Fill(segWh);
-        if (AMRPCflag > 0) m_plots["Eff_" + chambTag + "_AM+RPC_matched"]->Fill(segWh);
+//         if (AMRPCflag > 0) m_plots["Eff_" + chambTag + "_AM+RPC_matched"]->Fill(segWh);
       }
 
       if (seg_phi_t0->at(iSeg) > -500)
       {
         m_plots["Eff_" + chambTag + "_AM_total"]->Fill(segWh);
-        m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
+//         m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
       }
 //       if (iSeg == 0)
 //       {
