@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import ROOT as r
 from copy import deepcopy
-import CMS_lumi
+import CMS_lumi, os
 r.gROOT.SetBatch(True)
 
 #path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
-path = "~vrbouza/www/Miscelánea/2019_09_18_plots_eff_shiftsoff/"
+#path = "~vrbouza/www/Miscelánea/2019_09_23_plots_eff_shiftsoff_paSilvia"
+path = "~vrbouza/www/Miscelánea/2019_09_24_plots_eff_shiftsoff"
 
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}{qu}{id}"
@@ -15,6 +16,7 @@ suffix = ""
 def makeresplot(hlist, aged, algo, qual = "", pued = False, ind = ""):
     print "\nObtaining intermediate plot for algo", algo, "which is", aged, "aged and considering", pued, "pile-up"
     print "The file that it's going to be opened is", "results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + ind + suffix + ".root"
+
     res = r.TFile.Open("results_eff_" + ((not pued) * "no") + "pu_" + (not aged) * "no" + "age_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_{q}".format(q = qual) + "_{id}".format(id = ind) * (ind != "") + suffix + ".root")
 
     print "Then, we're gonna get the histograms labeled as follows:", plotscaffold.format(al = algo.replace("+RPC", ""), st = chambTag[0], ty = "matched")
@@ -44,7 +46,7 @@ def makeresplot(hlist, aged, algo, qual = "", pued = False, ind = ""):
     return
 
 
-lowlimityaxis  = 0.6
+lowlimityaxis  = 0.2
 highlimityaxis = 1
 markersize     = 1
 yaxistitle     = "Efficiency (adim.)"
@@ -126,9 +128,9 @@ def combineresplots(hlist, qual = "", pued = False, ind = ""):
 
 
     #c.SetLogy()
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".png")
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".pdf")
-    c.SaveAs(path + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".root")
+    c.SaveAs(path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".png")
+    c.SaveAs(path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".pdf")
+    c.SaveAs(path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + ".root")
     c.Close(); del c
     return
 
@@ -159,9 +161,15 @@ def producetheSilviaplots():
 
 
 #### ACTUAL EXECUTION AND SMALL NICE CODE
+
+if not os.path.isdir(path):
+    print "Creating output folder..."
+    os.system("mkdir " + path)
+    os.system("cp " + path + "/../index.php " + path + "/")
+
 producetheTDRplot("")
 producetheTDRplot("", True)
 producetheTDRplot("nothreehits")
 producetheTDRplot("nothreehits", True)
 
-producetheSilviaplots()
+#producetheSilviaplots()
