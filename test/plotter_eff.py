@@ -185,15 +185,15 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = True):
 def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
     print "\nBeginning plotting for pu", pu, "\n"
     listofplots = []
-    makeresplot(listofplots, False, "AM",     qual, pu, ind, zoom)
-    makeresplot(listofplots, True,  "AM",     qual, pu, ind, zoom)
-    #makeresplot(listofplots, False, "HB",     qual, pu, ind, zoom)
-    #makeresplot(listofplots, True,  "HB",     qual, pu, ind, zoom)
-    makeresplot(listofplots, False, "AM+RPC", qual, pu, ind, zoom)
-    makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind, zoom)
+    makeresplot(listofplots, False, "AM",     qual, pu, ind)
+    makeresplot(listofplots, True,  "AM",     qual, pu, ind)
+    #makeresplot(listofplots, False, "HB",     qual, pu, ind)
+    #makeresplot(listofplots, True,  "HB",     qual, pu, ind)
+    makeresplot(listofplots, False, "AM+RPC", qual, pu, ind)
+    makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind)
 
     print "\nCombining and saving\n"
-    combineresplots(listofplots, qual, pu, ind)
+    combineresplots(listofplots, qual, pu, ind, zoom)
 
 
 def producetheSilviaplots():
