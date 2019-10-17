@@ -187,8 +187,8 @@ def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
     listofplots = []
     makeresplot(listofplots, False, "AM",     qual, pu, ind)
     makeresplot(listofplots, True,  "AM",     qual, pu, ind)
-    #makeresplot(listofplots, False, "HB",     qual, pu, ind)
-    #makeresplot(listofplots, True,  "HB",     qual, pu, ind)
+    makeresplot(listofplots, False, "HB",     qual, pu, ind)
+    makeresplot(listofplots, True,  "HB",     qual, pu, ind)
     makeresplot(listofplots, False, "AM+RPC", qual, pu, ind)
     makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind)
 
