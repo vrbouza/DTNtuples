@@ -9,7 +9,7 @@ else:                  nCores = 1
 
 
 #path = "/pool/ciencias/userstorage/sscruz/DT_TDR_12sep/%s.root"
-path = "/pool/ciencias/userstorage/vrbouza/ntuples/DT_ntuples/shifts_offline_2019/2019_10_04/%s.root"
+path = "/pool/ciencias/userstorage/vrbouza/ntuples/DT_ntuples/shifts_offline_2019/2019_10_15/%s.root"
 
 #def ExecuteTheThing(pu, age, rpc, qual, ind = -99, indmax = +99):
 def ExecuteTheThing(tsk):

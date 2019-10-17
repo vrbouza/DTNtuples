@@ -6,7 +6,7 @@ r.gROOT.SetBatch(True)
 
 #path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
 #path = "~vrbouza/www/Miscelánea/2019_09_23_plots_eff_shiftsoff_paSilvia"
-path = "~vrbouza/www/Miscelánea/2019_10_04_plots_eff_shiftsoff"
+path = "~vrbouza/www/Miscelánea/2019_10_17_plots_eff_shiftsoff"
 
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}{qu}{id}"
@@ -52,32 +52,35 @@ def makeresplot(hlist, aged, algo, qual = "", pued = False, ind = ""):
 
 #lowlimityaxis  = 0.2
 lowlimityaxis  = 0.8
-highlimityaxis = 1
+#lowlimityaxis  = 0.4
+highlimityaxis = 1.01
 markersize     = 1
 yaxistitle     = "Efficiency (adim.)"
 yaxistitleoffset= 1.5
 xaxistitle     = "Wheel"
-legxlow        = 0.3075 + 2 * 0.1975
+#legxlow        = 0.3075 + 2 * 0.1975  # Old
+legxlow        = 0.3075 + 1 * 0.1975
 legylow        = 0.3
 legxhigh       = 0.9
 legyhigh       = 0.5
+legtextsize    = 0.02
 
 markertypedir  = {}
 markertypedir["AM_age"]       = 24
 markertypedir["AM_noage"]     = 20
 #markertypedir["AM+RPC_age"]   = 29
 #markertypedir["AM+RPC_noage"] = 29
-markertypedir["AM+RPC_age"]   = 28
-markertypedir["AM+RPC_noage"] = 34
+markertypedir["AM+RPC_age"]   = 26
+markertypedir["AM+RPC_noage"] = 22
 markertypedir["HB_noage"]     = 22
 markertypedir["HB_age"]       = 22
 
 markercolordir  = {}
-markercolordir["AM_age"]       = 2
-markercolordir["AM+RPC_age"]   = 2
-markercolordir["AM+RPC_noage"] = 4
+markercolordir["AM_age"]       = 46
+markercolordir["AM+RPC_age"]   = 46
+markercolordir["AM+RPC_noage"] = 9
 markercolordir["HB_noage"]     = 4
-markercolordir["AM_noage"]     = 4
+markercolordir["AM_noage"]     = 9
 markercolordir["HB_age"]       = 2
 
 namedir  = {}
@@ -88,7 +91,7 @@ namedir["HB_noage"]     = "HB"
 namedir["AM_noage"]     = "AM"
 namedir["HB_age"]       = "HB w/ ageing"
 
-def combineresplots(hlist, qual = "", pued = False, ind = ""):
+def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = True):
     print "Combining list of plots that has", pued, "pile-up,", qual, "quality and", ind, "index."
     if len(hlist) == 0: raise RuntimeError("Empty list of plots")
 
@@ -97,9 +100,10 @@ def combineresplots(hlist, qual = "", pued = False, ind = ""):
     c.SetGrid()
 
     leg = r.TLegend(legxlow, legylow, legxhigh, legyhigh)
+    #leg.SetTextSize(legtextsize);
     hlist[0].SetStats(False)
     #hlist[0].SetTitle("L1 DT Phase 2 algorithm efficiency comparison")
-    hlist[0].GetYaxis().SetRangeUser(lowlimityaxis, highlimityaxis)
+    hlist[0].GetYaxis().SetRangeUser(lowlimityaxis if zoom else 0.4, highlimityaxis)
     hlist[0].GetYaxis().SetTitleOffset(yaxistitleoffset)
     hlist[0].GetYaxis().SetTitle(yaxistitle)
     hlist[0].GetXaxis().SetTitle(xaxistitle)
@@ -127,9 +131,17 @@ def combineresplots(hlist, qual = "", pued = False, ind = ""):
         textlist[-1].SetNDC(True)
         textlist[-1].Draw("same")
         if ich != 3:
-            linelist.append(r.TLine(0.3075 + ich * 0.1975, 0.1, 0.3075 + ich * 0.1975, 0.9))
-            linelist[-1].SetNDC(True)
-            linelist[-1].Draw("same")
+            if ich == 2:
+                linelist.append(r.TLine(0.3075 + ich * 0.1975, 0.1, 0.3075 + ich * 0.1975, legylow))
+                linelist[-1].SetNDC(True)
+                linelist[-1].Draw("same")
+                linelist.append(r.TLine(0.3075 + ich * 0.1975, legyhigh, 0.3075 + ich * 0.1975, 0.9))
+                linelist[-1].SetNDC(True)
+                linelist[-1].Draw("same")
+            else:
+                linelist.append(r.TLine(0.3075 + ich * 0.1975, 0.1, 0.3075 + ich * 0.1975, 0.9))
+                linelist[-1].SetNDC(True)
+                linelist[-1].Draw("same")
 
     #cmslat = r.TLatex()
     #cmslat.SetTextSize(0.03);
@@ -144,19 +156,23 @@ def combineresplots(hlist, qual = "", pued = False, ind = ""):
 
     firsttex = r.TLatex()
     firsttex.SetTextSize(0.03)
-    firsttex.DrawLatexNDC(0.11,0.91,"#scale[1.5]{CMS} Phase-2 Simulation")
+    #firsttex.DrawLatexNDC(0.11,0.91,"#scale[1.5]{CMS} Phase-2 Simulation")  ## La de Brieuc
+    firsttex.DrawLatexNDC(0.11,0.92,"#scale[1.5]{CMS} Phase-2 Simulation")
     firsttex.Draw("same");
 
     secondtext = r.TLatex()
-    toDisplay  = r.TString("14 TeV, 3000 fb^{-1}, 200 PU")
-    secondtext.SetTextSize(0.035)
+    if pued: toDisplay  = r.TString("14 TeV, 3000 fb^{-1}, 200 PU, p_{T}>20 GeV")
+    else:    toDisplay  = r.TString("14 TeV, 3000 fb^{-1}, 0 PU, p_{T}>20 GeV")
+    #secondtext.SetTextSize(0.035) ## La de Brieuc
+    secondtext.SetTextSize(0.0275)
     secondtext.SetTextAlign(31)
-    secondtext.DrawLatexNDC(0.90, 0.91, toDisplay.Data())
+    #secondtext.DrawLatexNDC(0.90, 0.91, toDisplay.Data())  ## La de Brieuc
+    secondtext.DrawLatexNDC(0.90, 0.92, toDisplay.Data())
     secondtext.Draw("same")
 
     #c.SetLogy()
 
-    outputscaff = path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != ""))
+    outputscaff = path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + "_zoomout" * (not zoom)
 
     c.SaveAs(outputscaff + ".png")
     c.SaveAs(outputscaff + ".pdf")
@@ -166,15 +182,15 @@ def combineresplots(hlist, qual = "", pued = False, ind = ""):
     return
 
 
-def producetheTDRplot(qual = "", pu = False, ind = ""):
+def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
     print "\nBeginning plotting for pu", pu, "\n"
     listofplots = []
-    makeresplot(listofplots, False, "AM",     qual, pu, ind)
-    makeresplot(listofplots, True,  "AM",     qual, pu, ind)
-    makeresplot(listofplots, False, "HB",     qual, pu, ind)
-    makeresplot(listofplots, True,  "HB",     qual, pu, ind)
-    makeresplot(listofplots, False, "AM+RPC", qual, pu, ind)
-    makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind)
+    makeresplot(listofplots, False, "AM",     qual, pu, ind, zoom)
+    makeresplot(listofplots, True,  "AM",     qual, pu, ind, zoom)
+    #makeresplot(listofplots, False, "HB",     qual, pu, ind, zoom)
+    #makeresplot(listofplots, True,  "HB",     qual, pu, ind, zoom)
+    makeresplot(listofplots, False, "AM+RPC", qual, pu, ind, zoom)
+    makeresplot(listofplots, True,  "AM+RPC", qual, pu, ind, zoom)
 
     print "\nCombining and saving\n"
     combineresplots(listofplots, qual, pu, ind)
@@ -204,5 +220,12 @@ producetheTDRplot("nothreehits")
 producetheTDRplot("nothreehits", True)
 producetheTDRplot("qualityOR")
 producetheTDRplot("qualityOR", True)
+
+producetheTDRplot("", zoom = False)
+producetheTDRplot("", True, zoom = False)
+producetheTDRplot("nothreehits", zoom = False)
+producetheTDRplot("nothreehits", True, zoom = False)
+producetheTDRplot("qualityOR", zoom = False)
+producetheTDRplot("qualityOR", True, zoom = False)
 
 #producetheSilviaplots()
