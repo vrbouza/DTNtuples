@@ -84,7 +84,6 @@ if __name__ == '__main__':
     config.JobType.psetName   = 'dtDpgNtuples_phase2_cfg.py'
 
     config.JobType.maxMemoryMB = 2500
-    #config.JobType.inputFiles  = ['MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db']
     #config.JobType.allowUndistributedCMSSW = True
 
     config.Data.inputDBS    = 'global'
@@ -117,6 +116,7 @@ if __name__ == '__main__':
                 p.join()
             else:
                 for scn in listOfScenarios:
+                    config.JobType.inputFiles  = [ageing_scenarios[cfg][0].replace("ageingInput=sqlite_file:", "")]
                     tmpcond =  running_options[cfg]
                     tmpcond += ageing_scenarios[scn]
                     config.General.requestName   = sample + '_' + cfg + scn
