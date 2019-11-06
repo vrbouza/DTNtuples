@@ -69,7 +69,7 @@ def CheckCRABStatus(crabdirpath):
 
 
 def SendCRABJob(tsk):
-    sample, cfg, scn, crabdirpath = tsk
+    sample, cfg, scn, crabdirpath, outputdir = tsk
     from CRABAPI.RawCommand       import crabCommand
     from CRABClient.UserUtilities import config
     from multiprocessing          import Process
@@ -81,7 +81,7 @@ def SendCRABJob(tsk):
     def submit(config):
         res = crabCommand('submit', config = config )
 
-    config.General.workArea     = crabdirpath.split("_")[0]
+    config.General.workArea     = crabdirpath.split("/")[0]
     config.General.transferLogs = True
 
     config.JobType.pluginName  = 'Analysis'
@@ -90,26 +90,22 @@ def SendCRABJob(tsk):
     config.JobType.pyCfgParams = running_options[cfg] + ageing_scenarios[scn]
 
     config.JobType.maxMemoryMB = 2500
-    #config.JobType.allowUndistributedCMSSW = True
 
     config.Data.inputDBS    = 'global'
     config.Data.splitting   = 'FileBased'
     config.Data.unitsPerJob = 1
-    #config.Data.splitting   = 'Automatic'
     config.Data.publication = False
     config.Data.allowNonValidInputDataset = True
 
-    #config.Data.outLFNDirBase = '/store/user/sesanche/DT_L1_TDR_12_09_19'
-    config.Data.outLFNDirBase = '/store/user/rodrigvi/Producciones_2019-10-31/'
-    #config.Data.outLFNDirBase = '/store/group/phys_muon/rodrigvi/'
+    config.Data.outLFNDirBase = outputdir
 
     config.Site.storageSite = 'T2_ES_IFCA'
     #config.Site.storageSite = 'T2_CH_CERN'
     config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
 
-    config.General.requestName   = sample + '_' + cfg + "_" + scn + "LOSBUENOS"
+    config.General.requestName   = sample + '_' + cfg + "_" + scn
     config.Data.inputDataset     = dataset[sample]
-    config.Data.outputDatasetTag = sample + '_' + cfg + "_" + scn + "LOSBUENOS"
+    config.Data.outputDatasetTag = sample + '_' + cfg + "_" + scn
 
     p = Process(target=submit, args=(config,))
     p.start()
@@ -118,13 +114,14 @@ def SendCRABJob(tsk):
 
 
 def RelaunchCRABJob(crabdirpath):
-    options  = crabdirpath.split("/")[-1].replace("crab_", "").replace("LOSBUENOS", "")
+    options  = crabdirpath.split("/")[-1].replace("crab_", "")
 
-    sample   = options.split("_")[0]
-    ageing   = options.split("_")[1]
-    rpcuse   = options.split("_")[2]
+    sample   = options.split("_")[0] if "nu_" not in options else "_".join(options.split("_")[:2])
+    ageing   = options.split("_")[1] if "nu_" not in options else options.split("_")[2]
+    rpcuse   = options.split("_")[2] if "nu_" not in options else options.split("_")[3]
     scenario = ""
-    if "noage" not in ageing: scenario = "_".join(options.split("_")[3:])
+    outdir   = ""
+    if "noage" not in ageing: scenario = "_".join(options.split("_")[3:]) if "nu_" not in options else "_".join(options.split("_")[4:])
 
     useyoungseg = False
     if "youngseg" in scenario:
@@ -132,13 +129,24 @@ def RelaunchCRABJob(crabdirpath):
         scenario = scenario.replace("youngseg_", "")
 
 
-    print "\n# Job for the sample", sample, "with ageing", ageing, "with rpc use", rpcuse, "and ageing scenario", scenario + "."
+    print "\n# Job for the sample", sample, "with ageing", ageing, "with rpc use", rpcuse, "and ageing scenario", scenario, "and with young segments (not aged)" if useyoungseg else "and with aged segments."
 
-    print "# Erasing crab directory..."
+    print "# Importing CRAB output directory..."
+    logfile = open(crabdirpath + "/crab.log", "r")
+
+    for line in logfile.readlines():
+        if "config.Data.outLFNDirBase" in line:
+            outdir = line.replace("config.Data.outLFNDirBase", "").replace(" ", "").replace("=", "").replace("'", "").replace('"', "").replace("\n", "")
+            break
+    if outdir == "": raise RuntimeError("FATAL: no CRAB output directory could be obtained from crab log.")
+    logfile.close()
+
+    print "# CRAB output directory is", outdir
+    print "# Erasing CRAB workarea..."
     os.system("rm -rf " + crabdirpath)
 
     print "# Relaunching job..."
-    SendCRABJob( (sample, ageing + "_" + rpcuse + "_youngseg" * useyoungseg, scenario, crabdirpath) )
+    SendCRABJob( (sample, ageing + "_" + rpcuse + "_youngseg" * useyoungseg, scenario, crabdirpath, outdir) )
     return
 
 

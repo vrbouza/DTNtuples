@@ -2,6 +2,7 @@ import sys
 from multiprocessing import Pool
 
 name      = '2019_11_06_NeutrinoProduction'  #Part of the name of your output directory, adapt as needed.
+#name      = '2019_11_05_HBproduccion'  #Part of the name of your output directory, adapt as needed.
 
 running_options = {
     'noage_norpc'          : ['useRPC=0'],
@@ -45,8 +46,8 @@ listOfOptions = [
 listOfSamples = [
     #"nopu",
     #"pu200",
-    "nu_pu140",
-    "nu_pu200",
+    #"nu_pu140",
+    #"nu_pu200",
     "nu_pu250",
     #"nu_pu300",
 ]
@@ -56,8 +57,8 @@ listOfScenarios = [
     'muonage_norpcage_nofail_3000_OLD',
     'muonage_norpcage_nofail_3000',
     'muonage_norpcage_fail_3000',
-    'muonage_norpcage_nofail_1000',
-    'muonage_norpcage_fail_1000',
+    #'muonage_norpcage_nofail_1000',
+    #'muonage_norpcage_fail_1000',
 ]
 
 
@@ -129,6 +130,7 @@ if __name__ == '__main__':
     config.Data.publication = False
     #config.Data.outLFNDirBase = '/store/user/sesanche/DT_L1_TDR_12_09_19'
     config.Data.outLFNDirBase = '/store/user/rodrigvi/2019_11_06_NeutrinoProduction/'
+    #config.Data.outLFNDirBase = '/store/user/rodrigvi/2019_11_05_HBproduccion/'
     #config.Data.outLFNDirBase = '/store/group/phys_muon/rodrigvi/'
     config.Data.allowNonValidInputDataset = True
 
