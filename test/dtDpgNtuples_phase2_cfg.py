@@ -140,14 +140,15 @@ process.rpcRecHits.rpcDigiLabel = cms.InputTag('simMuonRPCDigis')
 # Use RPC
 process.load('Configuration.Geometry.GeometryExtended2023D38Reco_cff')
 process.load('Configuration.Geometry.GeometryExtended2023D38_cff')
+
 if options.useRPC:
     process.dtTriggerPhase2PrimitiveDigis.useRPC = True
+
 process.dtTriggerPhase2PrimitiveDigis.max_quality_to_overwrite_t0 = 10 # strict inequality
 process.dtTriggerPhase2PrimitiveDigis.scenario = 0 # 0 for mc, 1 for data, 2 for slice test
 
 
 process.dtTriggerPhase2AmPrimitiveDigis = process.dtTriggerPhase2PrimitiveDigis.clone()
-process.dtTriggerPhase2AmPrimitiveDigis.useRPC = True
 
 process.load('L1Trigger.DTHoughTPG.DTTPG_cfi')
 
