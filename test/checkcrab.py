@@ -2,6 +2,7 @@ import sys, os
 import subprocess as sp
 from multiprocessing import Pool
 
+agedornot = False
 
 running_options = {
     'noage_norpc'          : ['useRPC=0'],
@@ -103,9 +104,9 @@ def SendCRABJob(tsk):
     #config.Site.storageSite = 'T2_CH_CERN'
     config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
 
-    config.General.requestName   = sample + '_' + cfg + "_" + scn
+    config.General.requestName   = sample + '_' + cfg + ("_" + scn) * (scn != "")
     config.Data.inputDataset     = dataset[sample]
-    config.Data.outputDatasetTag = sample + '_' + cfg + "_" + scn
+    config.Data.outputDatasetTag = sample + '_' + cfg + ("_" + scn) * (scn != "")
 
     p = Process(target=submit, args=(config,))
     p.start()
@@ -130,6 +131,10 @@ def RelaunchCRABJob(crabdirpath):
 
 
     print "\n# Job for the sample", sample, "with ageing", ageing, "with rpc use", rpcuse, "and ageing scenario", scenario, "and with young segments (not aged)" if useyoungseg else "and with aged segments."
+
+    if (agedornot and ("noage" in ageing)) or ((not agedornot) and ("noage" not in ageing)):
+        print "# This script is not set to relaunch aged/unaged samples. Please, change the configuration at its beginning."
+        return
 
     print "# Importing CRAB output directory..."
     logfile = open(crabdirpath + "/crab.log", "r")

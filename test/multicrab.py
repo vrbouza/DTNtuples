@@ -30,16 +30,16 @@ dataset = {
     'nu_pu140': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU140_106X_upgrade2023_realistic_v3_ext3-v1/GEN-SIM-DIGI-RAW',
     'nu_pu200': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v3/GEN-SIM-DIGI-RAW',
     'nu_pu250': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU250_106X_upgrade2023_realistic_v3_ext2-v1/GEN-SIM-DIGI-RAW',
-    'nu_pu300': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU300_106X_upgrade2023_realistic_v3_ext1-v2/GEN-SIM-DIGI-RAW',
+    #'nu_pu300': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU300_106X_upgrade2023_realistic_v3_ext1-v2/GEN-SIM-DIGI-RAW',
 }
 
 listOfOptions = [
-    #'noage_norpc',
+    'noage_norpc',
     #'noage_withrpc' ,
     #'age_norpc',
     #'age_withrpc'   ,
-    'age_norpc_youngseg',
-    'age_withrpc_youngseg',
+    #'age_norpc_youngseg',
+    #'age_withrpc_youngseg',
 ]
 
 
@@ -47,8 +47,8 @@ listOfSamples = [
     #"nopu",
     #"pu200",
     #"nu_pu140",
-    #"nu_pu200",
-    "nu_pu250",
+    "nu_pu200",
+    #"nu_pu250",
     #"nu_pu300",
 ]
 
@@ -57,8 +57,8 @@ listOfScenarios = [
     'muonage_norpcage_nofail_3000_OLD',
     'muonage_norpcage_nofail_3000',
     'muonage_norpcage_fail_3000',
-    #'muonage_norpcage_nofail_1000',
-    #'muonage_norpcage_fail_1000',
+    'muonage_norpcage_nofail_1000',
+    'muonage_norpcage_fail_1000',
 ]
 
 
