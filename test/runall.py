@@ -9,9 +9,9 @@ if len(sys.argv) == 2: nCores = int(sys.argv[1])
 else:                  nCores = 1
 
 #suffix = ""
-#suffix = "_AllCuts"
+suffix = "_AllCuts"
 #suffix = "_newDPhiDEtacuts"
-suffix = "_newSL2requirement"
+#suffix = "_newSL2requirement"
 #suffix = "_newTimecut"
 
 #path = "/pool/ciencias/userstorage/sscruz/DT_TDR_12sep/%s.root"
@@ -46,7 +46,7 @@ def ExecuteTheThing(tsk):
                * (ind != -99 or indmax != +99))
 
     print "> Analysing file", inname
-    analysis = r.DTNtupleTPGSimAnalyzer(path%inname, outname, qual, ind, indmax)
+    analysis = r.DTNtupleTPGSimAnalyzer(path%inname, "./results/" + outname, qual, ind, indmax)
     analysis.Loop()
     print "> File saved as", outname
     return
