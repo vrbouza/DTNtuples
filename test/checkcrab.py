@@ -54,13 +54,14 @@ def CheckCRABStatus(crabdirpath):
             serverstatus = line.replace("Status on the CRAB server:", "").replace(" ", "").replace("\t", "")
         if "Status on the scheduler:" in line:
             schedstatus  = line.replace("Status on the scheduler:", "").replace(" ", "").replace("\t", "")
+        if schedstatus == "" and "Cannot retrieve the status_cache file" in line: schedstatus = "STATUSUNREACHABLE"
         if "Jobs status" in line:
             nSubJobs = int(line.split("(")[-1][:-1].split("/")[-1])
         if "idle" in line and "Warning" not in line: nIdleSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
         if "running" in line and "Warning" not in line: nRunningSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
         if "transferring" in line and "Warning" not in line: nTransferringSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
         if "finished" in line and "Warning" not in line: nFinishedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
-        if "failed" in line and "Warning" not in line and "step" not in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
+        if "failed" in line and "Warning" not in line and "step" not in line and "(" in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
 
 
     #print "  - Job with server status:   ", serverstatus + "."
@@ -102,7 +103,7 @@ def SendCRABJob(tsk):
 
     config.Site.storageSite = 'T2_ES_IFCA'
     #config.Site.storageSite = 'T2_CH_CERN'
-    config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
+    #config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
 
     config.General.requestName   = sample + '_' + cfg + ("_" + scn) * (scn != "")
     config.Data.inputDataset     = dataset[sample]
@@ -157,7 +158,7 @@ def RelaunchCRABJob(crabdirpath):
 
 def ResubmitCRABJob(crabdirpath):
     print "> Resubmitting CRAB job with directory path", crabdirpath + "..."
-    os.system("crab resubmit -d {d}".format(d = crabdirpath))
+    os.system("crab resubmit -d {d} --siteblacklist=''".format(d = crabdirpath))
 
     return
 
@@ -242,16 +243,21 @@ if __name__ == '__main__':
             "nfail"   : nfail,
             "ntot"    : ntot
         }
-        if job[1] == "SUBMITFAILED":
+        if   job[1] == "SUBMITFAILED":
             crabdir = job[0].split("/")[-1]
             print "# Job of CRAB directory", crabdir, "with SUBMITFAILED server status: adding to relaunching list."
             relaunchinglist.append(job[0])
-        if job[1] == "SUBMITTED":
-            submittedlist.append(job[0])
-            if   job[2] != "COMPLETED" and job[2] != "FAILED" and (nrun != 0 or ntransf != 0):
-                notfinnotfaillist.append(job[0])
-            elif job[2] != "COMPLETED" and job[2] != "FAILED":
-                fullyidlelist.append(job[0])
+        elif job[1] == "SUBMITTED":
+            if job[2] == "STATUSUNREACHABLE":
+                crabdir = job[0].split("/")[-1]
+                print "# Job of CRAB directory", crabdir, "with SUBMITTED server status but with unknown server status: adding to relaunching list."
+                relaunchinglist.append(job[0])
+            else:
+                submittedlist.append(job[0])
+                if   job[2] != "COMPLETED" and job[2] != "FAILED" and (nrun != 0 or ntransf != 0):
+                    notfinnotfaillist.append(job[0])
+                elif job[2] != "COMPLETED" and job[2] != "FAILED":
+                    fullyidlelist.append(job[0])
 
 
         if job[2] == "COMPLETED":
@@ -274,17 +280,17 @@ if __name__ == '__main__':
     print "# Completed jobs:                      ", str(len(completedlist)) + "/" + str(int(totaljobs)),   "(%3.1f "%(len(completedlist)/totaljobs * 100) + "%)"
     print ""
     print "# Total subjobs:        ", int(ntotalsubjobs)
-    print "# Idle subjobs:         ", str(int(nidletotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nidletotal/ntotalsubjobs * 100) + "% of total" + (nnotfinishedsubjobs != 0) * (", %3.1f "%(nidletotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") + ")"
-    print "# Running subjobs:      ", str(int(nruntotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nruntotal/ntotalsubjobs * 100) + "% of total" + (nnotfinishedsubjobs != 0) * (", %3.1f "%(nruntotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") + ")"
+    print "# Idle subjobs:         ", str(int(nidletotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nidletotal/ntotalsubjobs * 100) + "% of total" + ((", %3.1f "%(nidletotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") if (nnotfinishedsubjobs != 0) else "") + ")"
+    print "# Running subjobs:      ", str(int(nruntotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nruntotal/ntotalsubjobs * 100) + "% of total" + ((", %3.1f "%(nruntotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") if (nnotfinishedsubjobs != 0) else "") + ")"
     print "# Transferring subjobs: ", str(int(ntransftotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(ntransftotal/ntotalsubjobs * 100) + "%)"
     print "# Finished subjobs:     ", str(int(nfintotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nfintotal/ntotalsubjobs * 100) + "%)"
     print "# Failed subjobs:       ", str(int(nfailtotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nfailtotal/ntotalsubjobs * 100) + "%)"
 
     print "\n========== DETAILED REPORT =========="
-    print "> Jobs not even submitted:"
-    if len(relaunchinglist) == 0: print "# There is not any CRAB job that was not submitted!"
+    print "> Jobs not even submitted or submitted w/o error but with unknown and unretrieveable scheduler status:"
+    if len(relaunchinglist) == 0: print "# There is not any CRAB job in that situation!"
     else:
-        print "### There are", len(relaunchinglist), "CRAB jobs that were not submitted."
+        print "### There are", len(relaunchinglist), "CRAB jobs in such situation."
         for job in relaunchinglist: print "#", job
 
     print "\n> Jobs submitted, but completely idle:"
@@ -324,7 +330,9 @@ if __name__ == '__main__':
         sys.exit()
 
     print "\nThere are a total of", len(relaunchinglist), "jobs marked for relaunching and", len(withfailedlist), "jobs marked for resubmitting.\n"
-    if not confirm(): sys.exit()
+    if not confirm():
+        print "\n"
+        sys.exit()
 
     if len(relaunchinglist) != 0:
         print "\n>  Initiating relaunch..."
