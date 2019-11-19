@@ -86,11 +86,11 @@ def customiseForAgeing(process, pathName, segmentAgeing, triggerAgeing, rpcAgein
         process.dt1DRecHits.dtDigiLabel = "agedDtDigis"
 
     if triggerAgeing :
-        print "[customiseForAgeing]: switching emulatros input to agedDtDigis"
-        process.CalibratedDigis.dtDigiTag = "agedDtDigis"
+        print "[customiseForAgeing]: switching emulators input to agedDtDigis"
+        process.CalibratedDigis.dtDigiTag                   = "agedDtDigis"
+        process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "agedDtDigis"
 
     if rpcAgeing :
-
         if hasattr(process,"rpcRecHits") :
             print "[customiseForAgeing]: prepending ageing before rpcRecHits and adding ageing to RandomNumberGeneratorService"
 

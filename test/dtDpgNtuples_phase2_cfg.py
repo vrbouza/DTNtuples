@@ -155,6 +155,7 @@ process.load('L1Trigger.DTHoughTPG.DTTPG_cfi')
 process.dtTriggerPhase2HbPrimitiveDigis = process.DTTPG.clone()
 process.dtTriggerPhase2HbPrimitiveDigis.FirstBX = cms.untracked.int32(20)
 process.dtTriggerPhase2HbPrimitiveDigis.LastBX = cms.untracked.int32(20)
+process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "simMuonDTDigis"
 
 process.load('RecoLocalMuon.Configuration.RecoLocalMuon_cff')
 process.dt1DRecHits.dtDigiLabel = "simMuonDTDigis"
