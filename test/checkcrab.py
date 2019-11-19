@@ -1,42 +1,13 @@
 import sys, os
+import CentralSettings as cs
 import subprocess as sp
 from multiprocessing import Pool
+from datetime import datetime
 
-agedornot = False
-
-running_options = {
-    'noage_norpc'          : ['useRPC=0'],
-    'age_norpc'            : ['applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=0'],
-    'age_norpc_youngseg'   : ['applyTriggerAgeing=True', 'useRPC=0'], # Ageing in trigger, but not in reco segments
-    'noage_withrpc'        : ['useRPC=1'],
-    'age_withrpc'          : ['applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=1'],
-    'age_withrpc_youngseg' : ['applyTriggerAgeing=True', 'useRPC=1'], # Ageing in trigger, but not in reco segments
-}
+#agedornot           = False
 
 
-ageing_scenarios = {
-    'muonage_norpcage_nofail_3000_OLD': ['ageingInput=sqlite_file:MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db', "ageingTag=MuonSystemAging_3000fbm1"],
-    'muonage_norpcage_nofail_3000'      : ['ageingInput=sqlite_file:MuonAgeingAndFailures_3000fbm1_DT_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_3000fbm1_DT_L1TTDR"],
-    'muonage_norpcage_fail_3000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_3000fbm1_DT-RPC_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_3000fbm1_DT-RPC_L1TTDR", "applyRpcAgeing=True"],
-    'muonage_norpcage_nofail_1000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_1000fbm1_DT_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_1000fbm1_DT_L1TTDR"],
-    'muonage_norpcage_fail_1000'      : ['ageingInput=sqlite_file:MuonAgeingAndFailures_1000fbm1_DT-RPC_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_1000fbm1_DT-RPC_L1TTDR", "applyRpcAgeing=True"],
-    "" : [],
-}
-
-dataset = {
-    "nopu"    : "/Mu_FlatPt2to100-pythia8-gun/PhaseIITDRSpring19DR-NoPU_106X_upgrade2023_realistic_v3-v1/GEN-SIM-DIGI-RAW",
-    "pu200"   : "/Mu_FlatPt2to100-pythia8-gun/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v2/GEN-SIM-DIGI-RAW",
-    'nu_pu140': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU140_106X_upgrade2023_realistic_v3_ext3-v1/GEN-SIM-DIGI-RAW',
-    'nu_pu200': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v3/GEN-SIM-DIGI-RAW',
-    'nu_pu250': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU250_106X_upgrade2023_realistic_v3_ext2-v1/GEN-SIM-DIGI-RAW',
-    'nu_pu300': '/Nu_E10-pythia8-gun/PhaseIITDRSpring19DR-PU300_106X_upgrade2023_realistic_v3_ext1-v2/GEN-SIM-DIGI-RAW',
-}
-
-
-dirscaffold = "crab_{suffix}"
-
-
-def CheckCRABStatus(crabdirpath):
+def CheckCRABTaskStatus(crabdirpath):
     print "> Checking status for CRAB directory path", crabdirpath + "..."
     statusoutput = sp.check_output("crab status -d {d}".format(d = crabdirpath), shell = True)
     serverstatus         = ""
@@ -64,58 +35,13 @@ def CheckCRABStatus(crabdirpath):
         if "failed" in line and "Warning" not in line and "step" not in line and "(" in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
 
 
-    #print "  - Job with server status:   ", serverstatus + "."
-    #print "  - Job with scheduler status:", schedstatus + "."
+    print "  - Task with server status:   ", serverstatus + "."
+    print "  - Task with scheduler status:", schedstatus + "."
 
     return (crabdirpath, serverstatus, schedstatus, "total:{tot}-idle:{idl}-running:{rn}-transferring:{trf}-finished:{fin}-failed:{fal}".format(tot = nSubJobs, idl = nIdleSubJobs, rn = nRunningSubJobs, trf = nTransferringSubJobs, fin = nFinishedSubJobs, fal = nFailedSubJobs))
 
 
-def SendCRABJob(tsk):
-    sample, cfg, scn, crabdirpath, outputdir = tsk
-    from CRABAPI.RawCommand       import crabCommand
-    from CRABClient.UserUtilities import config
-    from multiprocessing          import Process
-
-    print "# Sending CRAB job for sample", sample, ", configuration", cfg, "and ageing scenario", scn
-
-    config = config()
-
-    def submit(config):
-        res = crabCommand('submit', config = config )
-
-    config.General.workArea     = crabdirpath.split("/")[0]
-    config.General.transferLogs = True
-
-    config.JobType.pluginName  = 'Analysis'
-    config.JobType.psetName    = 'dtDpgNtuples_phase2_cfg.py'
-    if scn != "": config.JobType.inputFiles  = [ageing_scenarios[scn][0].replace("ageingInput=sqlite_file:", "")]
-    config.JobType.pyCfgParams = running_options[cfg] + ageing_scenarios[scn]
-
-    config.JobType.maxMemoryMB = 2500
-
-    config.Data.inputDBS    = 'global'
-    config.Data.splitting   = 'FileBased'
-    config.Data.unitsPerJob = 1
-    config.Data.publication = False
-    config.Data.allowNonValidInputDataset = True
-
-    config.Data.outLFNDirBase = outputdir
-
-    config.Site.storageSite = 'T2_ES_IFCA'
-    #config.Site.storageSite = 'T2_CH_CERN'
-    #config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
-
-    config.General.requestName   = sample + '_' + cfg + ("_" + scn) * (scn != "")
-    config.Data.inputDataset     = dataset[sample]
-    config.Data.outputDatasetTag = sample + '_' + cfg + ("_" + scn) * (scn != "")
-
-    p = Process(target=submit, args=(config,))
-    p.start()
-    p.join()
-    return
-
-
-def RelaunchCRABJob(crabdirpath):
+def RelaunchCRABTask(crabdirpath):
     options  = crabdirpath.split("/")[-1].replace("crab_", "")
 
     sample   = options.split("_")[0] if "nu_" not in options else "_".join(options.split("_")[:2])
@@ -131,11 +57,11 @@ def RelaunchCRABJob(crabdirpath):
         scenario = scenario.replace("youngseg_", "")
 
 
-    print "\n# Job for the sample", sample, "with ageing", ageing, "with rpc use", rpcuse, "and ageing scenario", scenario, "and with young segments (not aged)" if useyoungseg else "and with aged segments."
+    print "\n# Task for the sample", sample, "with ageing", ageing, "with rpc use", rpcuse, "and ageing scenario", scenario, "and with young segments (not aged)" if useyoungseg else "and with aged segments."
 
-    if (agedornot and ("noage" in ageing)) or ((not agedornot) and ("noage" not in ageing)):
-        print "# This script is not set to relaunch aged/unaged samples. Please, change the configuration at its beginning."
-        return
+    #if (agedornot and ("noage" in ageing)) or ((not agedornot) and ("noage" not in ageing)):
+        #print "# This script is not set to relaunch aged/unaged samples. Please, change the configuration at its beginning."
+        #return
 
     print "# Importing CRAB output directory..."
     logfile = open(crabdirpath + "/crab.log", "r")
@@ -151,17 +77,17 @@ def RelaunchCRABJob(crabdirpath):
     print "# Erasing CRAB workarea..."
     os.system("rm -rf " + crabdirpath)
 
-    print "# Relaunching job..."
-    SendCRABJob( (sample, ageing + "_" + rpcuse + "_youngseg" * useyoungseg, scenario, crabdirpath, outdir) )
+    print "# Relaunching task..."
+    cs.LaunchCRABTask( (sample, ageing + "_" + rpcuse + "_youngseg" * useyoungseg,
+                        scenario, crabdirpath.split("/")[0], outdir) )
     return
 
 
-def ResubmitCRABJob(crabdirpath):
-    print "> Resubmitting CRAB job with directory path", crabdirpath + "..."
-    os.system("crab resubmit -d {d} --siteblacklist=''".format(d = crabdirpath))
+def ResubmitCRABTask(crabdirpath):
+    print "> Resubmitting CRAB task with directory path", crabdirpath + "..."
+    os.system("crab resubmit -d {d}".format(d = crabdirpath))
 
     return
-
 
 
 def GetSubJobsFromJob(inputstring):
@@ -179,17 +105,32 @@ def GetSubJobsFromJob(inputstring):
     return (nidle, nrun, ntransf, nfin, nfail, ntot)
 
 
+def GetYMDandHMSfromDate(date):
+    dateymd = date.split(" ")[0].split("-"); datehms = date.split(" ")[1].split(":")
+    year = dateymd[0]; month  = dateymd[1]; day    = dateymd[2];
+    hour = datehms[0]; minute = datehms[1]; second = datehms[2];
 
-def confirm():
-    """
-    Ask user to enter Y or N (case-insensitive).
-    :return: True if the answer is Y.
-    :rtype: bool
-    """
-    answer = ""
-    while answer not in ["y", "n"]:
-        answer = raw_input("Do you wish to continue? [Y/N]\n").lower()
-    return answer == "y"
+    return [year, month, day, hour, minute, second]
+
+
+def IsDate1SomeMinutesBeforeDate2(date1, date2, minutes = 7):
+    times1 = GetYMDandHMSfromDate(date1)
+    times2 = GetYMDandHMSfromDate(date2)
+    IndeedItIs = True
+    TimeScale  = 0
+
+    while (IndeedItIs == True and TimeScale < 5): # We ignore seconds
+        if   times1[TimeScale] > times2[TimeScale]:                     IndeedItIs = False
+        elif times1[TimeScale] == times2[TimeScale] and TimeScale == 4: IndeedItIs = False
+        elif times1[TimeScale] < times2[TimeScale]  and TimeScale != 4: break
+        elif (times1[TimeScale] < times2[TimeScale]
+             and abs(times1[TimeScale] - times2[TimeScale]) < minutes): IndeedItIs = False
+
+        TimeScale += 1
+
+    return IndeedItIs
+
+
 
 
 if __name__ == '__main__':
@@ -198,29 +139,29 @@ if __name__ == '__main__':
     basedir = sys.argv[1]
     if basedir[-1] == "/": basedir = basedir[:-1]
 
-    print "\n> We are going to check the folder", basedir, "to see if there are CRAB jobs that failed on submission."
-    print "    - We will look for all folders with scaffold", dirscaffold.format(suffix = "*")
+    print "\n> We are going to check the folder", basedir, "to see if there are CRAB tasks that failed on submission."
     print "\n----> REMEMBER TO SET CRAB PROPERLY!!! <----"
 
     listofsubdirs      = os.listdir(basedir)
-    listofcrabdirpaths = [basedir + "/" + subdir for subdir in listofsubdirs]
+    listofcrabdirpaths = [basedir + "/" + subdir for subdir in listofsubdirs if "crab_" == subdir[:5]]
 
     statuslist = []
 
+    ncores = 0
     if len(sys.argv) >= 3:
         ncores = int(sys.argv[2])
         print "\n> Parallelising with", ncores, "cores."
         pool = Pool(ncores)
-        statuslist = pool.map(CheckCRABStatus, listofcrabdirpaths)
+        statuslist = pool.map(CheckCRABTaskStatus, listofcrabdirpaths)
         pool.close()
         pool.join()
         del pool
     else:
         for crabdirpath in listofcrabdirpaths:
-            statuslist.append(CheckCRABStatus(crabdirpath))
+            statuslist.append(CheckCRABTaskStatus(crabdirpath))
 
-    print "\n> Reviewing job' status..."
-    totaljobs       = float(len(statuslist))
+    print "\n> Reviewing task' status..."
+    totaltasks      = float(len(statuslist))
     relaunchinglist = []
     submittedlist   = []
     completedlist   = []
@@ -229,12 +170,14 @@ if __name__ == '__main__':
     notfinnotfaillist = []
     fullyidlelist   = []
     nSubJobsDict    = {}
+    justlaunchedunretrievedlist = []
 
-    nidletotal = 0.; nruntotal = 0.; ntransftotal = 0.; nfintotal = 0.; nfailtotal = 0.; ntotalsubjobs = 0
+    nidletotal = 0.; nruntotal = 0.; ntransftotal = 0.; nfintotal = 0.; nfailtotal = 0.; ntotaljobs = 0
+    currentdate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for job in statuslist:
         nidle, nrun, ntransf, nfin, nfail, ntot = GetSubJobsFromJob(job[3])
-        nidletotal += nidle; nruntotal += nrun; nfintotal += nfin; nfailtotal += nfail; ntotalsubjobs += ntot
+        nidletotal += nidle; nruntotal += nrun; nfintotal += nfin; nfailtotal += nfail; ntotaljobs += ntot
         nSubJobsDict[job[0]] = {
             "nidle"   : nidle,
             "nrun"    : nrun,
@@ -245,13 +188,30 @@ if __name__ == '__main__':
         }
         if   job[1] == "SUBMITFAILED":
             crabdir = job[0].split("/")[-1]
-            print "# Job of CRAB directory", crabdir, "with SUBMITFAILED server status: adding to relaunching list."
+            print "# Task of CRAB directory", crabdir, "with SUBMITFAILED server status: adding to relaunching list."
             relaunchinglist.append(job[0])
         elif job[1] == "SUBMITTED":
             if job[2] == "STATUSUNREACHABLE":
                 crabdir = job[0].split("/")[-1]
-                print "# Job of CRAB directory", crabdir, "with SUBMITTED server status but with unknown server status: adding to relaunching list."
-                relaunchinglist.append(job[0])
+
+                # Checking if the tasks were just launched
+                logfile        = open(job[0] + "/crab.log", "r")
+                submitdate = "";
+
+                for line in logfile.readlines():
+                    if "Executing command: 'submit'" in line:
+                        submitdate = line.split("DEBUG ")[-1].split(".")[0]
+                        break
+                logfile.close(); del logfile
+
+                justlaunched = IsDate1SomeMinutesBeforeDate2(submitdate, currentdate, cs.UnretrieveThreshold)
+
+                if justlaunched:
+                    print "# Task of CRAB directory", crabdir, "with SUBMITTED server status but with unretrievable server status. It seems that it just has been launched (less than {thrsh} minutes).".format(thrsh = cs.UnretrieveThreshold)
+                    justlaunchedunretrievedlist.append(job[0])
+                else:
+                    print "# Task of CRAB directory", crabdir, "with SUBMITTED server status but with unretrievable server status: adding to relaunching list."
+                    relaunchinglist.append(job[0])
             else:
                 submittedlist.append(job[0])
                 if   job[2] != "COMPLETED" and job[2] != "FAILED" and (nrun != 0 or ntransf != 0):
@@ -266,88 +226,105 @@ if __name__ == '__main__':
         if nidle == 0 and nrun == 0 and ntransf != 0 and nfail == 0: onlytransflist.append(job[0])
         if nfail != 0: withfailedlist.append(job[0])
 
+    nnotfinishedjobs = nidletotal + nruntotal + nfailtotal
 
-    nnotfinishedsubjobs = nidletotal + nruntotal + nfailtotal
+
+    if len(justlaunchedunretrievedlist) != 0:
+        print "\n### WARNING: some tasks have unretrievable scheduler status, but they seem to have been just launched (in the previous {thrsh} minutes). The former usually happens as a consequence of the latter. These tasks are:".format(thrsh = cs.UnretrieveThreshold)
+        for tsk in justlaunchedunretrievedlist: print "#", tsk
+        print ""
+        if cs.confirm("Do you wish, nevertheless, to relaunch these tasks? (If you answer 'no', they will be still taken into account in the report)"):
+            relaunchinglist += justlaunchedunretrievedlist
+
 
     print "\n========== GLOBAL CRAB REPORT =========="
-    print "# Total jobs:                          ", int(totaljobs)
-    print "# Submitted jobs:                      ", str(len(submittedlist)) + "/" + str(int(totaljobs)),   "(%3.1f "%(len(submittedlist)/totaljobs * 100) + "%)"
-    print "# Unsubmitted jobs tagged for relaunch:", str(len(relaunchinglist)) + "/" + str(int(totaljobs)), "(%3.1f "%(len(relaunchinglist)/totaljobs * 100) + "%)"
-    print "# Transferring (only) jobs:            ", str(len(onlytransflist)) + "/" + str(int(totaljobs)),  "(%3.1f "%(len(onlytransflist)/totaljobs * 100) + "%)"
-    print "# With failed subjobs jobs:            ", str(len(withfailedlist)) + "/" + str(int(totaljobs)),  "(%3.1f "%(len(withfailedlist)/totaljobs * 100) + "%)"
-    print "# In normal execution jobs:            ", str(len(notfinnotfaillist)) + "/" + str(int(totaljobs)),  "(%3.1f "%(len(notfinnotfaillist)/totaljobs * 100) + "%)"
-    print "# Jobs submitted, but completely idle: ", str(len(fullyidlelist)) + "/" + str(int(totaljobs)),  "(%3.1f "%(len(fullyidlelist)/totaljobs * 100) + "%)"
-    print "# Completed jobs:                      ", str(len(completedlist)) + "/" + str(int(totaljobs)),   "(%3.1f "%(len(completedlist)/totaljobs * 100) + "%)"
+    print "# Total tasks:                          ", int(totaltasks)
+    print "# Submitted tasks:                      ", str(len(submittedlist)) + "/" + str(int(totaltasks)),   "(%3.1f "%(len(submittedlist)/totaltasks * 100) + "%)"
+    print "# Tasks tagged for relaunch:            ", str(len(relaunchinglist)) + "/" + str(int(totaltasks)), "(%3.1f "%(len(relaunchinglist)/totaltasks * 100) + "%)"
+    if len(justlaunchedunretrievedlist) != 0: print "# Submitted tasks with unretriveable sched. status:", str(len(justlaunchedunretrievedlist)) + "/" + str(int(totaltasks)), "(%3.1f "%(len(justlaunchedunretrievedlist)/totaltasks * 100) + "%)"
+    print "# Tasks with transferring (only) jobs:  ", str(len(onlytransflist)) + "/" + str(int(totaltasks)),  "(%3.1f "%(len(onlytransflist)/totaltasks * 100) + "%)"
+    print "# Tasks with failed jobs:               ", str(len(withfailedlist)) + "/" + str(int(totaltasks)),  "(%3.1f "%(len(withfailedlist)/totaltasks * 100) + "%)"
+    print "# Tasks in normal execution:            ", str(len(notfinnotfaillist)) + "/" + str(int(totaltasks)),  "(%3.1f "%(len(notfinnotfaillist)/totaltasks * 100) + "%)"
+    print "# Tasks submitted, but completely idle: ", str(len(fullyidlelist)) + "/" + str(int(totaltasks)),  "(%3.1f "%(len(fullyidlelist)/totaltasks * 100) + "%)"
+    print "# Completed tasks:                      ", str(len(completedlist)) + "/" + str(int(totaltasks)),   "(%3.1f "%(len(completedlist)/totaltasks * 100) + "%)"
     print ""
-    print "# Total subjobs:        ", int(ntotalsubjobs)
-    print "# Idle subjobs:         ", str(int(nidletotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nidletotal/ntotalsubjobs * 100) + "% of total" + ((", %3.1f "%(nidletotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") if (nnotfinishedsubjobs != 0) else "") + ")"
-    print "# Running subjobs:      ", str(int(nruntotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nruntotal/ntotalsubjobs * 100) + "% of total" + ((", %3.1f "%(nruntotal/nnotfinishedsubjobs * 100) + "% of not completed nor transferring") if (nnotfinishedsubjobs != 0) else "") + ")"
-    print "# Transferring subjobs: ", str(int(ntransftotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(ntransftotal/ntotalsubjobs * 100) + "%)"
-    print "# Finished subjobs:     ", str(int(nfintotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nfintotal/ntotalsubjobs * 100) + "%)"
-    print "# Failed subjobs:       ", str(int(nfailtotal)) + "/" + str(int(ntotalsubjobs)), "(%3.1f "%(nfailtotal/ntotalsubjobs * 100) + "%)"
+    print "# Total jobs:        ", int(ntotaljobs)
+    if int(ntotaljobs) != 0:
+        print "# Idle jobs:         ", str(int(nidletotal)) + "/" + str(int(ntotaljobs)), "(%3.1f "%(nidletotal/ntotaljobs * 100) + "% of total" + ((", %3.1f "%(nidletotal/nnotfinishedjobs * 100) + "% of not completed nor transferring") if (nnotfinishedjobs != 0) else "") + ")"
+        print "# Running jobs:      ", str(int(nruntotal)) + "/" + str(int(ntotaljobs)), "(%3.1f "%(nruntotal/ntotaljobs * 100) + "% of total" + ((", %3.1f "%(nruntotal/nnotfinishedjobs * 100) + "% of not completed nor transferring") if (nnotfinishedjobs != 0) else "") + ")"
+        print "# Transferring jobs: ", str(int(ntransftotal)) + "/" + str(int(ntotaljobs)), "(%3.1f "%(ntransftotal/ntotaljobs * 100) + "%)"
+        print "# Finished jobs:     ", str(int(nfintotal)) + "/" + str(int(ntotaljobs)), "(%3.1f "%(nfintotal/ntotaljobs * 100) + "%)"
+        print "# Failed jobs:       ", str(int(nfailtotal)) + "/" + str(int(ntotaljobs)), "(%3.1f "%(nfailtotal/ntotaljobs * 100) + "%)"
 
-    print "\n========== DETAILED REPORT =========="
-    print "> Jobs not even submitted or submitted w/o error but with unknown and unretrieveable scheduler status:"
-    if len(relaunchinglist) == 0: print "# There is not any CRAB job in that situation!"
+    print "\n========== DETAILED CRAB REPORT =========="
+    print "> Tasks tagged for relaunch (not even submitted or submitted w/o error but with unknown and unretrievable scheduler status):"
+    if len(relaunchinglist) == 0: print "# There is not any CRAB task in that situation!"
     else:
-        print "### There are", len(relaunchinglist), "CRAB jobs in such situation."
+        print "### There are", len(relaunchinglist), "CRAB tasks in such situation."
         for job in relaunchinglist: print "#", job
 
-    print "\n> Jobs submitted, but completely idle:"
-    if len(fullyidlelist) == 0: print "# There is not any CRAB job in such situation!"
+    print "\n> Tasks submitted, but completely idle:"
+    if len(fullyidlelist) == 0: print "# There is not any CRAB task in such situation!"
     else:
-        print "### There are", len(fullyidlelist), "CRAB jobs in such situation."
+        print "### There are", len(fullyidlelist), "CRAB tasks in such situation."
         for job in fullyidlelist: print "#", job
 
-    print "\n> Jobs in normal execution:"
-    if len(notfinnotfaillist) == 0: print "# There is not any CRAB job in normal execution!"
+    print "\n> Tasks in normal execution:"
+    if len(notfinnotfaillist) == 0: print "# There is not any CRAB task in normal execution!"
     else:
-        print "### There are", len(notfinnotfaillist), "CRAB jobs in normal execution."
+        print "### There are", len(notfinnotfaillist), "CRAB tasks in normal execution."
         for job in notfinnotfaillist: print "#", job
 
-    print "\n> Jobs with only transferring subjobs:"
-    if len(onlytransflist) == 0: print "# There is not any CRAB job with only transferring subjobs!"
+    print "\n> Tasks with only transferring jobs:"
+    if len(onlytransflist) == 0: print "# There is not any CRAB task with only transferring jobs!"
     else:
-        print "### There are", len(onlytransflist), "CRAB jobs with only transferring subjobs."
+        print "### There are", len(onlytransflist), "CRAB tasks with only transferring jobs."
         for job in onlytransflist:
-            print "### Job", job
-            print "# Transferring subjobs:", str(nSubJobsDict[job]["ntransf"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["ntransf"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
+            print "### Task", job
+            print "# Transferring jobs:", str(nSubJobsDict[job]["ntransf"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["ntransf"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
 
-    print "\n> Jobs with failed subjobs:"
-    if len(withfailedlist) == 0: print "# There is not any CRAB job with failed subjobs!"
+    print "\n> Tasks with failed jobs:"
+    if len(withfailedlist) == 0: print "# There is not any CRAB task with failed jobs!"
     else:
-        print "### There are", len(withfailedlist), "CRAB jobs with failed subjobs."
+        print "### There are", len(withfailedlist), "CRAB tasks with failed jobs."
         for job in withfailedlist:
-            print "### Job", job
-            print "# Idle subjobs:        ", str(nSubJobsDict[job]["nidle"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nidle"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
-            print "# Running subjobs:     ", str(nSubJobsDict[job]["nrun"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nrun"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
-            print "# Transferring subjobs:", str(nSubJobsDict[job]["ntransf"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["ntransf"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
-            print "# Finished subjobs:    ", str(nSubJobsDict[job]["nfin"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nfin"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
-            print "# Failed subjobs:      ", str(nSubJobsDict[job]["nfail"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nfail"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)\n"
+            print "### Task", job
+            print "# Idle jobs:        ", str(nSubJobsDict[job]["nidle"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nidle"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
+            print "# Running jobs:     ", str(nSubJobsDict[job]["nrun"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nrun"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
+            print "# Transferring jobs:", str(nSubJobsDict[job]["ntransf"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["ntransf"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
+            print "# Finished jobs:    ", str(nSubJobsDict[job]["nfin"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nfin"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)"
+            print "# Failed jobs:      ", str(nSubJobsDict[job]["nfail"]) + "/" + str(nSubJobsDict[job]["ntot"]), "(%3.1f "%(nSubJobsDict[job]["nfail"]/float(nSubJobsDict[job]["ntot"]) * 100) + "%)\n"
 
     if len(relaunchinglist) == 0 and len(withfailedlist) == 0:
-        print "\n> No jobs marked for relaunching nor resubmitting. Exitting."
+        print "\n> No tasks marked for relaunching nor resubmitting. Exitting."
         sys.exit()
 
-    print "\nThere are a total of", len(relaunchinglist), "jobs marked for relaunching and", len(withfailedlist), "jobs marked for resubmitting.\n"
-    if not confirm():
+    print "\nThere are a total of", len(relaunchinglist), "tasks marked for relaunching and", len(withfailedlist), "tasks marked for resubmitting.\n"
+    if not cs.confirm():
         print "\n"
         sys.exit()
 
     if len(relaunchinglist) != 0:
         print "\n>  Initiating relaunch..."
-        for job in relaunchinglist: RelaunchCRABJob(job)
-        print "\n> All jobs relaunched."
-
-    if len(withfailedlist) != 0:
-        print "\n> Initiating resubmit..."
-
-        if len(sys.argv) >= 3:
+        if ncores != 0:
             pool = Pool(ncores)
-            pool.map(ResubmitCRABJob, withfailedlist)
+            pool.map(RelaunchCRABTask, relaunchinglist)
             pool.close()
             pool.join()
             del pool
         else:
-            for job in withfailedlist: ResubmitCRABJob(job)
-        print "> All jobs resubmitted."
+            for job in withfailedlist: RelaunchCRABTask(job)
+        print "\n> All tasks relaunched."
+
+    if len(withfailedlist) != 0:
+        print "\n> Initiating resubmit..."
+
+        if ncores != 0:
+            pool = Pool(ncores)
+            pool.map(ResubmitCRABTask, withfailedlist)
+            pool.close()
+            pool.join()
+            del pool
+        else:
+            for job in withfailedlist: ResubmitCRABTask(job)
+        print "> All tasks resubmitted."
