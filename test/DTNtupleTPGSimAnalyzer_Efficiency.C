@@ -23,10 +23,10 @@ DTNtupleTPGSimAnalyzer::DTNtupleTPGSimAnalyzer(const TString & inFileName,
 
   m_minMuPt = 20;
 
-//  m_maxMuSegDPhi = 0.2; // Old
-//  m_maxMuSegDEta = 0.3; // Old
-   m_maxMuSegDPhi = 0.1;  // New
-   m_maxMuSegDEta = 0.15; // New
+//   m_maxMuSegDPhi = 0.2; // Old
+//   m_maxMuSegDEta = 0.3; // Old
+  m_maxMuSegDPhi = 0.1;  // New
+  m_maxMuSegDEta = 0.15; // New
 
   m_minSegHits = 4;
 
@@ -125,7 +125,8 @@ void DTNtupleTPGSimAnalyzer::fill()
       if (muSegDPhi <  m_maxMuSegDPhi &&
           muSegDEta <  m_maxMuSegDEta &&
           segNHits  >= m_minSegHits   &&
-          segNHits  >= bestSegNHits.at(segSt - 1)
+          segNHits  >= bestSegNHits.at(segSt - 1) &&
+          seg_phi_t0->at(iSeg) > -500
           && (TMath::Abs(seg_phi_t0->at(iSeg)) < 15) // CUT ON TIME
           && ((seg_z_nHits->at(iSeg) >= 4 && (segSt < 4)) || (segSt == 4)) // SL2 requirement
          )
@@ -220,15 +221,16 @@ void DTNtupleTPGSimAnalyzer::fill()
         }
       }
 
-      if (bestTPHB > -1 && seg_phi_t0->at(iSeg) > -500)
+//       if (bestTPHB > -1 && seg_phi_t0->at(iSeg) > -500)
+      if (bestTPHB > -1)
       {
         m_plots["Eff_" + chambTag + "_HB_matched"]->Fill(segWh);
       }
 
-      if (seg_phi_t0->at(iSeg) > -500)
-      {
+//       if (seg_phi_t0->at(iSeg) > -500)
+//       {
         m_plots["Eff_" + chambTag + "_HB_total"]->Fill(segWh);
-      }
+//       }
 
 
       // ==================== VARIABLES FOR THE ANALYTICAL METHOD ALGORITHM
@@ -310,17 +312,18 @@ void DTNtupleTPGSimAnalyzer::fill()
         }
       }
 
-      if (bestTPAM > -1 && seg_phi_t0->at(iSeg) > -500)
+//       if (bestTPAM > -1 && seg_phi_t0->at(iSeg) > -500)
+      if (bestTPAM > -1)
       {
         m_plots["Eff_" + chambTag + "_AM_matched"]->Fill(segWh);
 //         if (AMRPCflag > 0) m_plots["Eff_" + chambTag + "_AM+RPC_matched"]->Fill(segWh);
       }
 
-      if (seg_phi_t0->at(iSeg) > -500)
-      {
+//       if (seg_phi_t0->at(iSeg) > -500)
+//       {
         m_plots["Eff_" + chambTag + "_AM_total"]->Fill(segWh);
 //         m_plots["Eff_" + chambTag + "_AM+RPC_total"]->Fill(segWh);
-      }
+//       }
 //       if (iSeg == 0)
 //       {
 //         for (std::size_t iTrigAM = 0; iTrigAM < ph2TpgPhiEmuAm_nTrigs; ++iTrigAM)

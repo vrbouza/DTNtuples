@@ -5,23 +5,23 @@ import CMS_lumi, os
 r.gROOT.SetBatch(True)
 
 #path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
-#path = "~vrbouza/www/Miscelánea/2019_11_04_plots_eff_shiftsoff/IndividualApplyingOfCuts/"
-path = "~vrbouza/www/Miscelánea/2019_11_07_plots_eff_shiftsoff/AgeingComparisons/"
-#path = "~vrbouza/www/Miscelánea/2019_11_04_plots_eff_shiftsoff/"
+#path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/IndividualApplyingOfCuts/"
+#path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/AgeingComparisons/"
+path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/"
 
 openingpath  = "./results/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}{qu}{id}"
 chambTag     = ["MB1", "MB2", "MB3", "MB4"]
 
-suffix       = ""
-#suffix       = "_AllCuts"
+#suffix       = ""
+suffix       = "_AllCuts"
 #suffix       = "_newDPhiDEtacuts"
 #suffix       = "_newSL2requirement"
 #suffix       = "_newTimecut"
 
-#extrasuffix = ""
-extrasuffix  = "_AllScenarios"
+extrasuffix = ""
+#extrasuffix  = "_AllScenarios"
 #extrasuffix  = "_ONLYAMRPCWITHAM"
 #extrasuffix  = "_ONLYAM"
 #extrasuffix  = "_ONLYHB"
@@ -76,8 +76,9 @@ def makeresplot(hlist, aged, algo, qual = "", pu = "nopu", ind = "", neutr = "")
 lowlimityaxis  = 0.8
 #lowlimityaxis  = 0.4
 highlimityaxis = 1
-markersize     = 1
-yaxistitle     = "Efficiency (adim.)"
+markersize     = 1.5
+#yaxistitle     = "Efficiency (adim.)"
+yaxistitle     = "Efficiency"
 yaxistitleoffset= 1.5
 xaxistitle     = "Wheel"
 #legxlow        = 0.3075 + 2 * 0.1975 # Old
@@ -137,12 +138,12 @@ markercolordir["AM+RPC_muonage_norpcage_nofail_3000_OLD"] = markercolordir["AM+R
 markercolordir["HB_muonage_norpcage_nofail_3000_OLD"]     = markercolordir["HB_age"]
 
 ###
-#markercolordir["AM_muonage_norpcage_fail_3000"]           = markercolordir["AM_age"]
-#markercolordir["AM+RPC_muonage_norpcage_fail_3000"]       = markercolordir["AM+RPC_age"]
-#markercolordir["HB_muonage_norpcage_fail_3000"]           = markercolordir["HB_age"]
-markercolordir["AM_muonage_norpcage_fail_3000"]           = 4
-markercolordir["AM+RPC_muonage_norpcage_fail_3000"]       = 4
-markercolordir["HB_muonage_norpcage_fail_3000"]           = 4
+markercolordir["AM_muonage_norpcage_fail_3000"]           = markercolordir["AM_age"]
+markercolordir["AM+RPC_muonage_norpcage_fail_3000"]       = markercolordir["AM+RPC_age"]
+markercolordir["HB_muonage_norpcage_fail_3000"]           = markercolordir["HB_age"]
+#markercolordir["AM_muonage_norpcage_fail_3000"]           = 4
+#markercolordir["AM+RPC_muonage_norpcage_fail_3000"]       = 4
+#markercolordir["HB_muonage_norpcage_fail_3000"]           = 4
 ###
 
 markercolordir["AM_muonage_norpcage_nofail_3000"]         = 7
@@ -171,28 +172,19 @@ namedir["AM_muonage_norpcage_nofail_3000_OLD"]     = "DT AM w/ DT 3000fb-1 OLD"
 namedir["AM+RPC_muonage_norpcage_nofail_3000_OLD"] = "DT AM w/ DT 3000fb-1 OLD w/ RPC"
 namedir["HB_muonage_norpcage_nofail_3000_OLD"]     = "DT HB w/ DT 3000fb-1 OLD"
 
-### TAN MAL: CAMBIÁOS LOS FAIL Y NO FAIL DE 3000
+###
 #namedir["AM_muonage_norpcage_fail_3000"]           = "DT AM w/ DT+RPC 3000fb-1"
 #namedir["AM+RPC_muonage_norpcage_fail_3000"]       = "DT AM w/ DT+RPC 3000fb-1 w/ RPC"
 #namedir["HB_muonage_norpcage_fail_3000"]           = "DT HB w/ DT+RPC 3000fb-1"
 
-#namedir["AM_muonage_norpcage_fail_3000"]           = namedir["AM_age"]
-#namedir["AM+RPC_muonage_norpcage_fail_3000"]       = namedir["AM+RPC_age"]
-#namedir["HB_muonage_norpcage_fail_3000"]           = namedir["HB_age"]
-#TAN MAL: CAMBIÁOS LOS FAIL Y NO FAIL DE 3000
-namedir["AM_muonage_norpcage_fail_3000"]           = "DT AM w/ DT 3000fb-1"
-namedir["AM+RPC_muonage_norpcage_fail_3000"]       = "DT AM w/ DT 3000fb-1 w/ RPC"
-namedir["HB_muonage_norpcage_fail_3000"]           = "DT HB w/ DT 3000fb-1"
+namedir["AM_muonage_norpcage_fail_3000"]           = namedir["AM_age"]
+namedir["AM+RPC_muonage_norpcage_fail_3000"]       = namedir["AM+RPC_age"]
+namedir["HB_muonage_norpcage_fail_3000"]           = namedir["HB_age"]
 ###
 
-#TAN MAL: CAMBIÁOS LOS FAIL Y NO FAIL DE 3000
-namedir["AM_muonage_norpcage_nofail_3000"]         = "DT AM w/ DT+RPC 3000fb-1"
-namedir["AM+RPC_muonage_norpcage_nofail_3000"]     = "DT AM w/ DT+RPC 3000fb-1 w/ RPC"
-namedir["HB_muonage_norpcage_nofail_3000"]         = "DT HB w/ DT+RPC 3000fb-1"
-
-#namedir["AM_muonage_norpcage_nofail_3000"]         = "DT AM w/ DT 3000fb-1"
-#namedir["AM+RPC_muonage_norpcage_nofail_3000"]     = "DT AM w/ DT 3000fb-1 w/ RPC"
-#namedir["HB_muonage_norpcage_nofail_3000"]         = "DT HB w/ DT 3000fb-1"
+namedir["AM_muonage_norpcage_nofail_3000"]         = "DT AM w/ DT 3000fb-1"
+namedir["AM+RPC_muonage_norpcage_nofail_3000"]     = "DT AM w/ DT 3000fb-1 w/ RPC"
+namedir["HB_muonage_norpcage_nofail_3000"]         = "DT HB w/ DT 3000fb-1"
 
 namedir["AM_muonage_norpcage_fail_1000"]           = "DT AM w/ DT+RPC 1000fb-1"
 namedir["AM+RPC_muonage_norpcage_fail_1000"]       = "DT AM w/ DT+RPC 1000fb-1 w/ RPC"
@@ -237,11 +229,11 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
         hlist[iplot].SetMarkerStyle(markertypedir[( hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1] )])
         hlist[iplot].SetMarkerColor(markercolordir[(hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1])])
 
-        leg.AddEntry(hlist[iplot], namedir[(hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1])], "P")
-        #leg.AddEntry(hlist[iplot], namedir[(hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1])] + " w/ failures" * ("nofail" not in hlist[iplot].GetName() and "noage" not in hlist[iplot].GetName() and "RPC" in hlist[iplot].GetName()), "P")
+        #leg.AddEntry(hlist[iplot], namedir[(hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1])], "P")
+        leg.AddEntry(hlist[iplot], namedir[(hlist[iplot].GetName().split("_pu")[0].split("hEff_")[1] if pued else hlist[iplot].GetName().split("_nopu")[0].split("hEff_")[1])] + " w/ failures" * ("nofail" not in hlist[iplot].GetName() and "noage" not in hlist[iplot].GetName() and "RPC" in hlist[iplot].GetName()), "P")
 
-        #hlist[iplot].Draw("P,hist" + (iplot != 0) * "same")
-        hlist[iplot].Draw("PE,hist" + (iplot != 0) * "same")
+        hlist[iplot].Draw("P,hist" + (iplot != 0) * "same")
+        #hlist[iplot].Draw("PE,hist" + (iplot != 0) * "same")
 
     leg.Draw("HISTP")
 
@@ -282,13 +274,15 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
     firsttex.DrawLatexNDC(0.11, 0.92, "#scale[1.5]{CMS} Phase-2 Simulation")
     firsttex.Draw("same");
 
-    prelim_text = r.TLatex()
-    prelim_text.SetTextSize(0.03)
-    prelim_text.DrawLatexNDC(0.208, 0.865, "Preliminary")
+    #prelim_text = r.TLatex()
+    #prelim_text.SetTextSize(0.03)
+    #prelim_text.DrawLatexNDC(0.208, 0.865, "Preliminary")
 
     secondtext = r.TLatex()
-    if pued: toDisplay = r.TString("14 TeV, 3000 fb^{-1}, 200 PU, p_{T}>20 GeV")
-    else:    toDisplay = r.TString("14 TeV, 3000 fb^{-1}, 0 PU, p_{T}>20 GeV")
+    #if pued: toDisplay = r.TString("3000 fb^{-1}, 200 PU, p_{T}>20 GeV")
+    #else:    toDisplay = r.TString("3000 fb^{-1}, 0 PU, p_{T}>20 GeV")
+    if pued: toDisplay = r.TString("3000 fb^{-1}, 200 PU")
+    else:    toDisplay = r.TString("3000 fb^{-1}, 0 PU")
 
     #if pued: toDisplay = r.TString("14 TeV, 3000/1000 fb^{-1}, 200 PU, p_{T}>20 GeV")
     #else:    toDisplay = r.TString("14 TeV, 3000/1000 fb^{-1}, 0 PU, p_{T}>20 GeV")
@@ -301,6 +295,11 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
     secondtext.DrawLatexNDC(0.90, 0.92, toDisplay.Data())
     secondtext.Draw("same")
 
+    thirdtext = r.TLatex()
+    thirdtext.SetTextSize(0.0275)
+    thirdtext.SetTextAlign(31)
+    thirdtext.DrawLatexNDC(0.26, 0.865, "p_{T}>20 GeV")
+    secondtext.Draw("same")
     #c.SetLogy()
 
     outputscaff = path + "/" + savescaffold.format(pu = (not pued) * "no" + "pu", qu = ("_" + qual)*(qual != ""), id =("_" + ind)*(ind != "")) + "_zoomout" * (zoom == "zoomout") + "_zoomin" * (zoom == "zoomin") + "_extremezoomin" * (zoom == "extremezoomin") + suffix + extrasuffix
@@ -317,25 +316,25 @@ def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
     print "\nBeginning plotting for pu", pu, "\n"
     listofplots = []
 
-    #makeresplot(listofplots, "noage", "AM",     qual, "nopu" if not pu else "pu200", ind)
-    #makeresplot(listofplots, "noage", "HB",     qual, "nopu" if not pu else "pu200", ind)
-    #makeresplot(listofplots, "noage", "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, "noage", "AM",     qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, "noage", "HB",     qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, "noage", "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
     #makeresplot(listofplots, scenariolist[1],   "AM",     qual, "nopu" if not pu else "pu200", ind)
     #makeresplot(listofplots, scenariolist[1],   "HB",     qual, "nopu" if not pu else "pu200", ind)
     #makeresplot(listofplots, scenariolist[1],   "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
 
-    #makeresplot(listofplots, scenariolist[2],   "AM",     qual, "nopu" if not pu else "pu200", ind)
-    #makeresplot(listofplots, scenariolist[2],   "HB",     qual, "nopu" if not pu else "pu200", ind)
-    #makeresplot(listofplots, scenariolist[2],   "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, scenariolist[2],   "AM",     qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, scenariolist[2],   "HB",     qual, "nopu" if not pu else "pu200", ind)
+    makeresplot(listofplots, scenariolist[2],   "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
     #makeresplot(listofplots, "noage", "AM",     qual, "nopu" if not pu else "pu200", ind)
 
-    for scen in scenariolist:
-        makeresplot(listofplots, scen, "AM",     qual, "nopu" if not pu else "pu200", ind)
-        makeresplot(listofplots, scen, "HB",     qual, "nopu" if not pu else "pu200", ind)
-        makeresplot(listofplots, scen, "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
+    #for scen in scenariolist:
+        #makeresplot(listofplots, scen, "AM",     qual, "nopu" if not pu else "pu200", ind)
+        #makeresplot(listofplots, scen, "HB",     qual, "nopu" if not pu else "pu200", ind)
+        #makeresplot(listofplots, scen, "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
     print "\nCombining and saving\n"
     combineresplots(listofplots, qual, pu, ind, zoom)
@@ -379,3 +378,4 @@ producetheTDRplot("qualityOR",          zoom = "extremezoomin")
 producetheTDRplot("qualityOR", True,    zoom = "extremezoomin")
 
 #producetheSilviaplots()     ### NOT UPDATED
+
