@@ -42,4 +42,4 @@ Currently, the checkcrab.py script:
   * allows you to resubmit failed jobs,
   * allows you to relaunch tasks whose submission failed or whose scheduler status is unretrievable (with a special treatment for those just-launched tasks).
 
-Note that checkcrab.py does NOT check the output of the jobs in any way, nor is available of handling all possible CRAB problems/errors.
+Note that checkcrab.py does NOT check the output of the jobs in any way, nor is able of handling all possible CRAB problems/errors.
