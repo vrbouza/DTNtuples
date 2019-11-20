@@ -35,8 +35,8 @@ def CheckCRABTaskStatus(crabdirpath):
         if "failed" in line and "Warning" not in line and "step" not in line and "(" in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
 
 
-    print "  - Task with server status:   ", serverstatus + "."
-    print "  - Task with scheduler status:", schedstatus + "."
+    #print "  - Task with server status:   ", serverstatus + "."
+    #print "  - Task with scheduler status:", schedstatus + "."
 
     return (crabdirpath, serverstatus, schedstatus, "total:{tot}-idle:{idl}-running:{rn}-transferring:{trf}-finished:{fin}-failed:{fal}".format(tot = nSubJobs, idl = nIdleSubJobs, rn = nRunningSubJobs, trf = nTransferringSubJobs, fin = nFinishedSubJobs, fal = nFailedSubJobs))
 
@@ -171,6 +171,7 @@ if __name__ == '__main__':
     fullyidlelist   = []
     nSubJobsDict    = {}
     justlaunchedunretrievedlist = []
+    justlaunchedlist= []
 
     nidletotal = 0.; nruntotal = 0.; ntransftotal = 0.; nfintotal = 0.; nfailtotal = 0.; ntotaljobs = 0
     currentdate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -190,6 +191,9 @@ if __name__ == '__main__':
             crabdir = job[0].split("/")[-1]
             print "# Task of CRAB directory", crabdir, "with SUBMITFAILED server status: adding to relaunching list."
             relaunchinglist.append(job[0])
+        elif job[1] == "NEWoncommandSUBMIT":
+            crabdir = job[0].split("/")[-1]
+            justlaunchedlist.append(job[0])
         elif job[1] == "SUBMITTED":
             if job[2] == "STATUSUNREACHABLE":
                 crabdir = job[0].split("/")[-1]
@@ -240,6 +244,7 @@ if __name__ == '__main__':
     print "\n========== GLOBAL CRAB REPORT =========="
     print "# Total tasks:                          ", int(totaltasks)
     print "# Submitted tasks:                      ", str(len(submittedlist)) + "/" + str(int(totaltasks)),   "(%3.1f "%(len(submittedlist)/totaltasks * 100) + "%)"
+    print "# Just launched tasks:                  ", str(len(justlaunchedlist)) + "/" + str(int(totaltasks)),   "(%3.1f "%(len(justlaunchedlist)/totaltasks * 100) + "%)"
     print "# Tasks tagged for relaunch:            ", str(len(relaunchinglist)) + "/" + str(int(totaltasks)), "(%3.1f "%(len(relaunchinglist)/totaltasks * 100) + "%)"
     if len(justlaunchedunretrievedlist) != 0: print "# Submitted tasks with unretriveable sched. status:", str(len(justlaunchedunretrievedlist)) + "/" + str(int(totaltasks)), "(%3.1f "%(len(justlaunchedunretrievedlist)/totaltasks * 100) + "%)"
     print "# Tasks with transferring (only) jobs:  ", str(len(onlytransflist)) + "/" + str(int(totaltasks)),  "(%3.1f "%(len(onlytransflist)/totaltasks * 100) + "%)"
@@ -301,7 +306,7 @@ if __name__ == '__main__':
 
     print "\nThere are a total of", len(relaunchinglist), "tasks marked for relaunching and", len(withfailedlist), "tasks marked for resubmitting.\n"
     if not cs.confirm():
-        print "\n"
+        print ""
         sys.exit()
 
     if len(relaunchinglist) != 0:
@@ -313,7 +318,7 @@ if __name__ == '__main__':
             pool.join()
             del pool
         else:
-            for job in withfailedlist: RelaunchCRABTask(job)
+            for job in relaunchinglist: RelaunchCRABTask(job)
         print "\n> All tasks relaunched."
 
     if len(withfailedlist) != 0:
