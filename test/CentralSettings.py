@@ -61,6 +61,8 @@ def LaunchCRABTask(tsk):
     config.Site.storageSite = 'T2_ES_IFCA'
     #config.Site.storageSite = 'T2_CH_CERN'
     #config.Site.blacklist   = ['T2_BR_SPRACE', 'T2_US_Wisconsin', 'T1_RU_JINR', 'T2_RU_JINR', 'T2_EE_Estonia']
+    #config.Site.blacklist   = []
+    config.Site.ignoreGlobalBlacklist = True
 
     config.General.requestName   = sample + '_' + cfg + ("_" + scn) * (scn != "")
     config.Data.inputDataset     = dataset[sample]
