@@ -1,3 +1,4 @@
+import os, sys
 ### General settings
 UnretrieveThreshold = 7
 
@@ -31,18 +32,24 @@ dataset = {
 
 
 ### Function definitions
+#configurationCache = {}
 def LaunchCRABTask(tsk):
     sample, cfg, scn, workarea, outputdir = tsk
     from CRABAPI.RawCommand       import crabCommand
     from CRABClient.UserUtilities import config
+    from CRABClient.JobType       import CMSSWConfig
 
     print "# Launching CRAB task for sample {s}, config. {c} and ageing scenario {sc}.".format(s = sample, c = cfg, sc = scn)
+    #print "\nsyspath:", sys.path
+    #print "\ncwd:", os.getcwd()
+    #sys.exit()
     config = config()
 
     config.General.workArea     = workarea
     config.General.transferLogs = True
 
     config.JobType.pluginName  = 'Analysis'
+
     config.JobType.psetName    = 'dtDpgNtuples_phase2_cfg.py'
     if scn != "": config.JobType.inputFiles  = [ageing_scenarios[scn][0].replace("ageingInput=sqlite_file:", "")]
     config.JobType.pyCfgParams = running_options[cfg] + ageing_scenarios[scn]
@@ -69,6 +76,12 @@ def LaunchCRABTask(tsk):
     config.Data.outputDatasetTag = sample + '_' + cfg + ("_" + scn) * (scn != "")
 
     res = crabCommand('submit', config = config)
+    del config, res
+    CMSSWConfig.configurationCache.clear() #### NOTE: this is done in order to allow the parallelised CRAB job submission. For further
+                                           ## information, please check the code on [1], the commit of [2] and the discussion of [3].
+                                           ## [1]: https://github.com/dmwm/CRABClient/blob/master/src/python/CRABClient/JobType/CMSSWConfig.py
+                                           ## [2]: https://github.com/dmwm/CRABClient/commit/a50bfc2d1f32093b76ba80956ee6c5bd6d61259e
+                                           ## [3]: https://github.com/dmwm/CRABClient/pull/4824
     return
 
 
@@ -82,3 +95,20 @@ def confirm(message = "Do you wish to continue?"):
     while answer not in ["y", "n", "yes", "no"]:
         answer = raw_input(message + " [Y/N]\n").lower()
     return answer[0] == "y"
+
+
+def CheckExistanceOfFolders(listoftasks):
+    listoftaskswcreatedfolder = []
+    for tsk in listoftasks:
+        if os.path.isdir("./" + tsk[3] + "/crab_" + tsk[0] + '_' + tsk[1] + ("_" + tsk[2]) * (tsk[2] != "")): listoftaskswcreatedfolder.append(tsk)
+
+    return listoftaskswcreatedfolder
+
+
+def KillAndErase(tsk):
+    print "### Task with folder", "crab_" + tsk[0] + '_' + tsk[1] + ("_" + tsk[2]) * (tsk[2] != "")
+    print "# Killing..."
+    os.system("crab kill -d ./{wa}/{fl}".format(wa = tsk[3], fl = "crab_" + tsk[0] + '_' + tsk[1] + ("_" + tsk[2]) * (tsk[2] != "")))
+    print "# Erasing..."
+    os.system("rm -rf ./{wa}/{fl}".format(wa = tsk[3], fl = "crab_" + tsk[0] + '_' + tsk[1] + ("_" + tsk[2]) * (tsk[2] != "")))
+    return

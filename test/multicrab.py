@@ -1,11 +1,11 @@
-import sys
+import sys, os
 import CentralSettings as cs
 from multiprocessing import Pool
 
 ### Settings of the launch procedure: THEY ARE EXPECTED TO BE CHANGED DEPENDING ON THE EXECUTION
 
 # This will be used to create the CRAB workarea, as well as the output folder
-name = '2019_11_19_PruebaParalelizacion'
+name = '2019_12_06_ProduccionBuenaDeNuGunsPaJaime'
 
 # The name will be append to the following path to set the output directory
 outputdir = '/store/user/rodrigvi/'
@@ -14,29 +14,29 @@ outputdir = '/store/user/rodrigvi/'
 #outputdir = '/store/group/phys_muon/rodrigvi/'
 
 listOfSamples = [
-    "nopu",     # 0   PU central muon     gun sample
-    "pu200",    # 200 PU central muon     gun sample
+    #"nopu",     # 0   PU central muon     gun sample
+    #"pu200",    # 200 PU central muon     gun sample
     #"nu_pu140", # 140 PU central neutrino gun sample
-    #"nu_pu200", # 200 PU central neutrino gun sample
-    #"nu_pu250", # 250 PU central neutrino gun sample
+    "nu_pu200", # 200 PU central neutrino gun sample
+    "nu_pu250", # 250 PU central neutrino gun sample
     #"nu_pu300", ### NOT FINISHED SAMPLE
 ]
 
 listOfOptions = [
     'noage_norpc',          # Non-aged TP, with non-aged reco. segments, and with the AM not using RPC
-    #'noage_withrpc',        # Non-aged TP, with non-aged reco. segments, and with the AM using RPC
+    'noage_withrpc',        # Non-aged TP, with non-aged reco. segments, and with the AM using RPC
     #'age_norpc',            # Aged TP,     with aged reco. segments,     and with the AM not using RPC
     #'age_withrpc',          # Aged TP,     with aged reco. segments,     and with the AM using RPC
-    #'age_norpc_youngseg',   # Aged TP,     with non-aged reco. segments, and with the AM not using RPC
-    #'age_withrpc_youngseg', # Aged TP,     with non-aged reco. segments, and with the AM using RPC
+    'age_norpc_youngseg',   # Aged TP,     with non-aged reco. segments, and with the AM not using RPC
+    'age_withrpc_youngseg', # Aged TP,     with non-aged reco. segments, and with the AM using RPC
 ]
 
 listOfScenarios = [
-    'muonage_norpcage_nofail_3000_OLD', # DT ageing, without RPC failures, old 3000fb-1
+    #'muonage_norpcage_nofail_3000_OLD', # DT ageing, without RPC failures, old 3000fb-1
     'muonage_norpcage_nofail_3000',     # DT ageing, without RPC failures, 3000fb-1
     'muonage_norpcage_fail_3000',       # DT ageing, with    RPC failures, 3000fb-1
-    'muonage_norpcage_nofail_1000',     # DT ageing, without RPC failures, 1000fb-1
-    'muonage_norpcage_fail_1000',       # DT ageing, with    RPC failures, 1000fb-1
+    #'muonage_norpcage_nofail_1000',     # DT ageing, without RPC failures, 1000fb-1
+    #'muonage_norpcage_fail_1000',       # DT ageing, with    RPC failures, 1000fb-1
 ]
 
 
@@ -66,9 +66,30 @@ if __name__ == '__main__':
         print ""
         sys.exit()
 
+    listoftaskswcreatedfolder = cs.CheckExistanceOfFolders(tasks)
+
+    if len(listoftaskswcreatedfolder) != 0:
+        print "\nWARNING: there are {n} task/s that we are going to run that were/was previously executed in the chosen workarea. The CRAB task submission will fail.".format(n = len(listoftaskswcreatedfolder))
+        if not cs.confirm("Do you wish to send (just in case) a kill order to those tasks and afterwards erase the folders and continue with the execution? [Y/N]"):
+            print ""
+            sys.exit()
+
+        if len(sys.argv) > 1:
+            ncores = int(sys.argv[1])
+            print "\n> Parallelisation of old CRAB task killing and erasing with", ncores, "cores"
+            pool = Pool(ncores)
+            pool.map(cs.KillAndErase, listoftaskswcreatedfolder)
+            pool.close()
+            pool.join()
+            del pool
+        else:
+            for tsk in listoftaskswcreatedfolder: cs.KillAndErase(tsk)
+
+    if not os.path.isdir("./" + tsk[3]): os.system("mkdir ./" + tsk[3])
+
     if len(sys.argv) > 1:
         ncores = int(sys.argv[1])
-        print "\n> Parallelisation of CRAB task launching with", ncores
+        print "\n> Parallelisation of CRAB task launching with", ncores, "cores"
         pool = Pool(ncores)
         pool.map(cs.LaunchCRABTask, tasks)
         pool.close()
