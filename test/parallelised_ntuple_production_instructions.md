@@ -15,7 +15,23 @@ scramv1 b -j 5
 ```
 
 ### Customisation
-The ntuples production depends on whether you want to produce them with the AM TP and (or not) the HB algorithm too. If the second is true, you should take into account that this code is prepared to run with an automatised digi label selection, using the aged and the non aged too. The HB algorithm does not have this automatisation. You should therefore add the argument
+The ntuples production depends on whether you want to produce them with the AM TP and (or not) the HB algorithm too.
+
+In the case that you do not want the HB's TP, you do not have to checkout that code in your src folder, nor change those files, but you should comment all the hough algorithm-related lines, beginning from line ~150 with
+
+```
+process.load('L1Trigger.DTHoughTPG.DTTPG_cfi')
+```
+
+and finishing with
+
+```
+process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "simMuonDTDigis"
+```
+
+in addition of the respective entry in the process' path.
+
+If you want to have the HB's TP, you should take into account that this code is prepared to run with an automatised digi label selection, using the aged and the non aged too. The HB algorithm does not have this automatisation. You should therefore add the argument
 
 ```
 dtDigiLabel = cms.InputTag("simMuonDTDigis")
@@ -47,23 +63,6 @@ and change it for (or comment it and add the following):
 ```
 
 Then, you should compile again everything.
-
-In the case that you do not want these TP, you do not have to checkout that code in your src folder, nor change those files, but you should comment all the hough algorithm-related lines, beginning from line ~150 with
-
-```
-process.load('L1Trigger.DTHoughTPG.DTTPG_cfi')
-```
-
-and finishing with
-
-```
-process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "simMuonDTDigis"
-```
-
-in addition of the respective entry in the process' path.
-
-You can check the list of arguments in CentralSettings.py, and you can also see how they affect the production checking the python config file itself. You should subtitute FOLDER by a folder with rootfiles suitable to produce ntuples from.
-
 
 ### Test execution
 To execute a test of the ntuple production you can use cmsRun with the dtDphgNtuples_phase2_cfg.py, but you should set all the arguments that you want by hand. For example:
@@ -105,3 +104,11 @@ Currently, the checkcrab.py script:
 
 Note that checkcrab.py does NOT check the output of the jobs in any way, nor is able of handling all possible CRAB problems/errors.
 
+### Changing grouping algorithm of the AM
+The production of ntuples with different grouping algorithms is not (yet) automatised. To do so, you must add manually an entry to the dtDpgNtuples_phase2_cfg.py file, preferably with the rest of AM settings (line ~135) such as
+
+```
+process.dtTriggerPhase2PrimitiveDigis.grouping_code = 0
+```
+
+where you should change 0 for 1 (Hough transform-based grouping) or 2 (pseudo-Bayes grouping) accordingly.
