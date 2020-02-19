@@ -42,7 +42,7 @@ def customiseForPhase2Simulation(process) :
         process.dtNtupleProducer.ph1TwinMuxInThTag = "simDtTriggerPrimitiveDigis"
 
         process.dtNtupleProducer.ph2TPGPhiEmuAmTag = "dtTriggerPhase2AmPrimitiveDigis"
-        process.dtNtupleProducer.ph2TPGPhiEmuHbTag = "dtTriggerPhase2HbPrimitiveDigis:MMTCHT:"
+        if hasattr(process, "ph2TPGPhiEmuHbTag"): process.dtNtupleProducer.ph2TPGPhiEmuHbTag = "dtTriggerPhase2HbPrimitiveDigis:MMTCHT:"
 
     return process
 
@@ -88,7 +88,7 @@ def customiseForAgeing(process, pathName, segmentAgeing, triggerAgeing, rpcAgein
     if triggerAgeing :
         print "[customiseForAgeing]: switching emulators input to agedDtDigis"
         process.CalibratedDigis.dtDigiTag                   = "agedDtDigis"
-        process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "agedDtDigis"
+        if hasattr(process, "dtTriggerPhase2HbPrimitiveDigis"): process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "agedDtDigis"
 
     if rpcAgeing :
         if hasattr(process,"rpcRecHits") :
