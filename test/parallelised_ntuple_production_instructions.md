@@ -15,21 +15,24 @@ scramv1 b -j 5
 ```
 
 ### Customisation
-The ntuples production depends on whether you want to produce them with the AM TP and (or not) the HB algorithm too.
+The ntuples production depends on whether you want to produce them with the AM TP or the AM's TP as well as the HB ones too.
 
-In the case that you do not want the HB's TP, you do not have to checkout that code in your src folder, nor change those files, but you should comment all the hough algorithm-related lines, beginning from line ~150 with
+In the case that you do not want the HB's TP, you should comment all the hough algorithm-related lines, beginning from line ~150 the following:
 
 ```
 process.load('L1Trigger.DTHoughTPG.DTTPG_cfi')
-```
-
-and finishing with
-
-```
+process.dtTriggerPhase2HbPrimitiveDigis = process.DTTPG.clone()
+process.dtTriggerPhase2HbPrimitiveDigis.FirstBX = cms.untracked.int32(20)
+process.dtTriggerPhase2HbPrimitiveDigis.LastBX = cms.untracked.int32(20)
 process.dtTriggerPhase2HbPrimitiveDigis.dtDigiLabel = "simMuonDTDigis"
 ```
 
-in addition of the respective entry in the process' path.
+in addition of the respective entry in the process' path, which is:
+
+```
++ process.dtTriggerPhase2HbPrimitiveDigis
+```
+
 
 If you want to have the HB's TP, you should take into account that this code is prepared to run with an automatised digi label selection, using the aged and the non aged too. The HB algorithm does not have this automatisation. You should therefore add the argument
 
