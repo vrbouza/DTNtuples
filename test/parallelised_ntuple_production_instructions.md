@@ -48,9 +48,9 @@ Note that checkcrab.py does NOT check the output of the jobs in any way, nor is 
 To execute a test of the ntuple production you can use cmsRun with the dtDphgNtuples_phase2_cfg.py, but you should set all the arguments that you want by hand. For example:
 
 ```
-cmsRun dtDpgNtuples_phase2_cfg.py applyTriggerAgeing=True useRPC=1 ageingInput=sqlite_file:MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db ageingTag=MuonSystemAging_3000fbm1 applyRpcAgeing=True
+cmsRun dtDpgNtuples_phase2_cfg.py applyTriggerAgeing=True useRPC=1 ageingInput=sqlite_file:MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db ageingTag=MuonSystemAging_3000fbm1 applyRpcAgeing=True inputFolder=\"FOLDER\"
 ```
 
-You can check the list of arguments in CentralSettings.py, and you can also see how they affect the production checking the python config file itself.
+You can check the list of arguments in CentralSettings.py, and you can also see how they affect the production checking the python config file itself. You should subtitute FOLDER by a folder with rootfiles suitable to produce ntuples from.
 
 
