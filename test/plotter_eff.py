@@ -7,7 +7,7 @@ r.gROOT.SetBatch(True)
 #path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/IndividualApplyingOfCuts/"
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/AgeingComparisons/"
-path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/"
+path = "~vrbouza/www/Miscelánea/2020_02_27_plots_eff_shiftsoff/"
 
 openingpath  = "./results/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
@@ -81,6 +81,7 @@ markersize     = 1.5
 yaxistitle     = "Efficiency"
 yaxistitleoffset= 1.5
 xaxistitle     = "Wheel"
+xaxislabelsize = 0.03
 #legxlow        = 0.3075 + 2 * 0.1975 # Old
 #legxlow        = 0.3075 + 1 * 0.1975 # Good
 legxlow        = 0.3075
@@ -213,6 +214,8 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
     hlist[0].GetYaxis().SetTitle(yaxistitle)
     hlist[0].GetXaxis().SetTitle(xaxistitle)
     hlist[0].GetXaxis().SetNdivisions(120)
+    hlist[0].GetXaxis().SetLabelSize(xaxislabelsize)
+
     ilabel = 1
     for ich in range(4):
         for iwh in range(-2, 3):
@@ -271,7 +274,8 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
     firsttex = r.TLatex()
     firsttex.SetTextSize(0.03)
     #firsttex.DrawLatexNDC(0.11,0.91,"#scale[1.5]{CMS} Phase-2 Simulation")  ## La de Brieuc
-    firsttex.DrawLatexNDC(0.11, 0.92, "#scale[1.5]{CMS} Phase-2 Simulation")
+    #firsttex.DrawLatexNDC(0.11, 0.92, "#scale[1.5]{CMS} Phase-2 Simulation")
+    firsttex.DrawLatexNDC(0.11, 0.91, "#scale[1.5]{CMS} Phase-2 Simulation, Preliminary")
     firsttex.Draw("same");
 
     #prelim_text = r.TLatex()
@@ -358,6 +362,9 @@ if not os.path.isdir(path):
     print "Creating output folder..."
     os.system("mkdir " + path)
     os.system("cp " + path + "/../index.php " + path + "/")
+
+
+
 
 #producetheTDRplot("")
 #producetheTDRplot("", True)
