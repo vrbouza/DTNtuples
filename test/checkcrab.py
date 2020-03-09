@@ -32,7 +32,7 @@ def CheckCRABTaskStatus(crabdirpath):
         if "running" in line and "Warning" not in line: nRunningSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
         if "transferring" in line and "Warning" not in line: nTransferringSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
         if "finished" in line and "Warning" not in line: nFinishedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
-        if "failed" in line and "Warning" not in line and "step" not in line and "(" in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
+        if "failed" in line and "Warning" not in line and "step" not in line and "(" in line and "SSL" not in line: nFailedSubJobs = int(line.split("(")[-1][:-1].split("/")[0])
 
 
     #print "  - Task with server status:   ", serverstatus + "."
