@@ -1,5 +1,5 @@
 # DTNtuples
-Ntuples for the analysis of the CMS drift tubes detector performance. These are the instructions to produce parallelised ntuples using central samples.
+Ntuples for the analysis of the CMS drift tubes detector performance. These are the instructions to produce parallelised ntuples using central samples from MC samples (not guaranteed to work for data, nor either for slice test data).
 
 ### Installation
 Do the following in a CRAB-supported environment.
