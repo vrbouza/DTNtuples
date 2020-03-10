@@ -74,6 +74,12 @@ options.register('useRPC',
                  VarParsing.VarParsing.varType.int,
                  "Use RPC info")
 
+options.register('groupingCodeAM',
+                 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "Grouping to be used by the AM algorithm. By default, the standard one (0)")
+
 options.parseArguments()
 
 process = cms.Process("DTNTUPLES",eras.Phase2C8_timing_layer_bar)
@@ -146,7 +152,7 @@ if options.useRPC:
 
 process.dtTriggerPhase2PrimitiveDigis.max_quality_to_overwrite_t0 = 10 # strict inequality
 process.dtTriggerPhase2PrimitiveDigis.scenario = 0 # 0 for mc, 1 for data, 2 for slice test
-
+process.dtTriggerPhase2PrimitiveDigis.grouping_code = options.groupingCodeAM
 
 process.dtTriggerPhase2AmPrimitiveDigis = process.dtTriggerPhase2PrimitiveDigis.clone()
 

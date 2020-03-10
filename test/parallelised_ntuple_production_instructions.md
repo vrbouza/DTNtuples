@@ -108,10 +108,12 @@ Currently, the checkcrab.py script:
 Note that checkcrab.py does NOT check the output of the jobs in any way, nor is able of handling all possible CRAB problems/errors.
 
 ### Changing grouping algorithm of the AM
-The production of ntuples with different grouping algorithms is not (yet) automatised. To do so, you must add manually an entry to the dtDpgNtuples_phase2_cfg.py file, preferably with the rest of AM settings (line ~135) such as
-
+The production of ntuples with different grouping algorithms is not (yet) fully automatised. Currently, there is a line in the dtDpgNtuples_phase2_cfg.py file that sets the grouping. However this is still not automatised inside the multicrab & checkcrab scripts. Therefore, in the case of multicrab ntuple production with varied groupings for the AM algorithm, it is recommended to handle it manually: comment the present line that sets the grouping, which is
+```
+process.dtTriggerPhase2PrimitiveDigis.grouping_code = options.groupingCodeAM
+```
+and add it one like
 ```
 process.dtTriggerPhase2PrimitiveDigis.grouping_code = 0
 ```
-
 where you should change 0 for 1 (Hough transform-based grouping) or 2 (pseudo-Bayes grouping) accordingly.
