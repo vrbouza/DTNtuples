@@ -2,14 +2,14 @@ import os, sys
 ### General settings
 UnretrieveThreshold = 7
 
-### Directories with settings
+### Diccionaries with settings
 running_options = {
-    'noage_norpc'          : ['useRPC=0'],
-    'age_norpc'            : ['applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=0'],
-    'age_norpc_youngseg'   : ['applyTriggerAgeing=True', 'useRPC=0'], # Ageing in trigger, but not in reco segments
-    'noage_withrpc'        : ['useRPC=1'],
-    'age_withrpc'          : ['applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=1'],
-    'age_withrpc_youngseg' : ['applyTriggerAgeing=True', 'useRPC=1'], # Ageing in trigger, but not in reco segments
+    'noage_norpc'          : ["inputFolder=", 'useRPC=0'],
+    'age_norpc'            : ["inputFolder=", 'applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=0'],
+    'age_norpc_youngseg'   : ["inputFolder=", 'applyTriggerAgeing=True', 'useRPC=0'], # Ageing in trigger, but not in reco segments
+    'noage_withrpc'        : ["inputFolder=", 'useRPC=1'],
+    'age_withrpc'          : ["inputFolder=", 'applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=1'],
+    'age_withrpc_youngseg' : ["inputFolder=", 'applyTriggerAgeing=True', 'useRPC=1'], # Ageing in trigger, but not in reco segments
 }
 
 ageing_scenarios = {
