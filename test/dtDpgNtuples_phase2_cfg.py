@@ -100,21 +100,19 @@ if options.ageingInput != "" :
     process.GlobalTag.toGet.append(cms.PSet(record  = cms.string("MuonSystemAgingRcd"),
                                             connect = cms.string(options.ageingInput),
                                             tag     = cms.string(options.ageingTag)
-                                        )
-                               )
-    
+                                            )
+                                  )
     #process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2023_realistic_v3', 'MuonSystemAging_3000fbm1,MuonSystemAgingRcd,sqlite_file:./MuonSystemAging.db')
 
+
 process.source = cms.Source("PoolSource",
-                            
         fileNames = cms.untracked.vstring(),
         secondaryFileNames = cms.untracked.vstring()
-
 )
 
 if options.inputFolder != '':
-   files = subprocess.check_output(["ls", options.inputFolder])
-   process.source.fileNames = ["file://" + options.inputFolder + "/" + f for f in files.split()]
+    files = subprocess.check_output(["ls", options.inputFolder])
+    process.source.fileNames = ["file://" + options.inputFolder + "/" + f for f in files.split()]
 #process.source.fileNames = ['/store/mc/PhaseIITDRSpring19DR/Mu_FlatPt2to100-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/70000/F42F882F-B3A8-4346-870D-3E62C930D076.root'] ### For tests
 
 
