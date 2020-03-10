@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     if len(listoftaskswcreatedfolder) != 0:
         print "\nWARNING: there are {n} task/s that we are going to run that were/was previously executed in the chosen workarea. The CRAB task submission will fail.".format(n = len(listoftaskswcreatedfolder))
-        if not cs.confirm("Do you wish to send (just in case) a kill order to those tasks and afterwards erase the folders and continue with the execution? [Y/N]"):
+        if not cs.confirm("Do you wish to send (just in case) a kill order to those tasks and afterwards erase the folders and continue with the execution?"):
             print ""
             sys.exit()
 
