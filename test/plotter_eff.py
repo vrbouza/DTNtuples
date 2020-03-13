@@ -273,9 +273,9 @@ def combineresplots(hlist, qual = "", pued = False, ind = "", zoom = "normal"):
 
     firsttex = r.TLatex()
     firsttex.SetTextSize(0.03)
-    #firsttex.DrawLatexNDC(0.11,0.91,"#scale[1.5]{CMS} Phase-2 Simulation")  ## La de Brieuc
+    firsttex.DrawLatexNDC(0.11,0.91,"#scale[1.5]{CMS} Phase-2 Simulation")  ## La de Brieuc
     #firsttex.DrawLatexNDC(0.11, 0.92, "#scale[1.5]{CMS} Phase-2 Simulation")
-    firsttex.DrawLatexNDC(0.11, 0.91, "#scale[1.5]{CMS} Phase-2 Simulation, Preliminary")
+    #firsttex.DrawLatexNDC(0.11, 0.91, "#scale[1.5]{CMS} Phase-2 Simulation, Preliminary")
     firsttex.Draw("same");
 
     #prelim_text = r.TLatex()
