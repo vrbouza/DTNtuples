@@ -6,7 +6,7 @@ It is not necessary to do this in a CRAB-supported environment, nor with an avai
 git clone https://github.com/vrbouza/DTNtuples.git -b simulation_workflows
 ```
 ### Analysis -- Efficiencies
-To analyse the ntuples to obtain efficiency plots, a parallelised helper (runall.py) is available and, by default, configured to TDR-like parameters, as well as the analysis itself (DTNtupleTPGSimAnalyzer_Efficiency.C). To execute the analysis, you need to set the place in the runall.py script where the ntuples are located: the path variable at the beginning. In that folder, the ntuples must be merged. Then, you need to comment/uncomment in the file loadDTNtupleTPGSimAnalyzer the line of the resolution analyser/the line of the efficiency ananalyser. Afterwards, do the following (inside the test folder).
+To analyse the ntuples to obtain efficiency plots, a parallelised helper (runall.py) is available and, by default, configured to TDR-like parameters, as well as the analysis itself (DTNtupleTPGSimAnalyzer_Efficiency.C). To execute the analysis, you need to set the place in the runall.py script where the ntuples are located: the path variable at the beginning. In that folder, the ntuples must be merged. Then, you need to comment/uncomment in the file loadDTNtupleTPGSimAnalysis.C the line of the resolution analyser/the line of the efficiency analyser. Afterwards, do the following (inside the test folder).
 ```
 python runall.py NCORES
 ```

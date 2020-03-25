@@ -27,7 +27,6 @@ extrasuffix = ""
 #extrasuffix  = "_ONLYHB"
 scenariolist = ["noage", "muonage_norpcage_nofail_3000_OLD", "muonage_norpcage_fail_3000", "muonage_norpcage_nofail_3000", "muonage_norpcage_fail_1000", "muonage_norpcage_nofail_1000"]
 
-
 def makeresplot(hlist, aged, algo, qual = "", pu = "nopu", ind = "", neutr = ""):
     print "\nObtaining intermediate plot for algo", algo, "which has", aged, "ageing and considering", pu
 
@@ -166,8 +165,6 @@ namedir["AM+RPC_noage"] = "DT AM w/ RPC"
 namedir["HB_noage"]     = "DT HB"
 namedir["AM_noage"]     = "DT AM"
 namedir["HB_age"]       = "DT HB w/ ageing"
-
-scenariolist = ["noage", "muonage_norpcage_nofail_3000_OLD", "muonage_norpcage_fail_3000", "muonage_norpcage_nofail_3000", "muonage_norpcage_fail_1000", "muonage_norpcage_nofail_1000"]
 
 namedir["AM_muonage_norpcage_nofail_3000_OLD"]     = "DT AM w/ DT 3000fb-1 OLD"
 namedir["AM+RPC_muonage_norpcage_nofail_3000_OLD"] = "DT AM w/ DT 3000fb-1 OLD w/ RPC"
