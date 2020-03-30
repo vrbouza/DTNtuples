@@ -7,9 +7,10 @@ r.gROOT.SetBatch(True)
 #path = "~sscruz/www/DT_TDR/2019_12_09_plots_eff_withHBaged_noquality/"
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/IndividualApplyingOfCuts/"
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/AgeingComparisons/"
-path = "~vrbouza/www/Miscelánea/2020_02_27_plots_eff_shiftsoff/"
+#path = "~vrbouza/www/Miscelánea/2020_02_27_plots_eff_shiftsoff/"
+path = "~vrbouza/www/Miscelánea/2020_03_27_plots_eff_shiftsoff_pakike/"
 
-openingpath  = "./results/"
+openingpath  = "./results_pakike/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}{qu}{id}"
 chambTag     = ["MB1", "MB2", "MB3", "MB4"]
@@ -31,6 +32,8 @@ def makeresplot(hlist, aged, algo, qual = "", pu = "nopu", ind = "", neutr = "")
     print "\nObtaining intermediate plot for algo", algo, "which has", aged, "ageing and considering", pu
 
     openfile = "results_eff_" + neutr + pu + "_" + (aged if "noage" in aged else "age") + "_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + "_" * ("noage" not in aged) + ind + aged * ("noage" not in aged) + suffix + ".root"
+
+    if "_fail_" in aged and "+RPC" not in algo: openfile = openfile.replace("_fail_", "_nofail_")
 
     print "The file that it's going to be opened is", openfile
     res = r.TFile.Open(openingpath + openfile, "read")
