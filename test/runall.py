@@ -3,7 +3,7 @@ import ROOT as r
 from multiprocessing import Pool
 import sys
 r.gROOT.SetBatch(True)
-r.gROOT.ProcessLine(".x loadTPGSimAnalysis.C")
+r.gROOT.ProcessLine(".x loadTPGSimAnalysis_eff.C")
 
 if len(sys.argv) == 2: nCores = int(sys.argv[1])
 else:                  nCores = 1
@@ -16,8 +16,11 @@ suffix = "_AllCuts"
 
 #path = "/pool/ciencias/userstorage/sscruz/DT_TDR_12sep/%s.root"
 #path = "/pool/ciencias/userstorage/vrbouza/ntuples/DT_ntuples/shifts_offline_2019/2019_11_05/%s.root"
-path = "/pool/ciencias_users/user/vrbouza/www/Miscelánea/2019_11_06_temporalntuples/%s.root"
+#path = "/pool/ciencias_users/user/vrbouza/www/Miscelánea/2019_11_06_temporalntuples/%s.root"
+path = "/pool/phedex/userstorage/palencia/dtNtuples/2020_March06_standard/Mu_FlatPt2to100-pythia8-gun/%s.root"
 
+#outpath = "./results"
+outpath = "./results_pakike"
 
 #def ExecuteTheThing(pu, age, rpc, qual, ind = -99, indmax = +99):
 def ExecuteTheThing(tsk):
@@ -46,7 +49,7 @@ def ExecuteTheThing(tsk):
                * (ind != -99 or indmax != +99))
 
     print "> Analysing file", inname
-    analysis = r.DTNtupleTPGSimAnalyzer(path%inname, "./results/" + outname, qual, ind, indmax)
+    analysis = r.DTNtupleTPGSimAnalyzer(path%inname, outpath + "/" + outname, qual, ind, indmax)
     analysis.Loop()
     print "> File saved as", outname
     return
@@ -55,7 +58,8 @@ def ExecuteTheThing(tsk):
 tasks = []
 for neutr in [False]:
     for pu in ["nopu", "pu140", "pu200", "pu250"]:
-        for age in ["noage", "muonage_norpcage_nofail_3000_OLD", "muonage_norpcage_fail_3000", "muonage_norpcage_nofail_3000", "muonage_norpcage_fail_1000", "muonage_norpcage_nofail_1000"]:
+        #for age in ["noage", "muonage_norpcage_nofail_3000_OLD", "muonage_norpcage_fail_3000", "muonage_norpcage_nofail_3000", "muonage_norpcage_fail_1000", "muonage_norpcage_nofail_1000"]:
+        for age in ["noage", "muonage_norpcage_fail_3000", "muonage_norpcage_nofail_3000"]:
             for rpc in ["withrpc", "norpc"]:
                 #for qual in ["", "nothreehits", "higherthanfour", "higherthanfourvetoing", "qualityOR"]:
                 for qual in ["qualityOR"]:
