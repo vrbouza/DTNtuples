@@ -4,21 +4,21 @@ UnretrieveThreshold = 7
 
 ### Diccionaries with settings
 running_options = {
-    'noage_norpc'          : ["inputFolder=", 'useRPC=0'],
-    'age_norpc'            : ["inputFolder=", 'applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=0'],
-    'age_norpc_youngseg'   : ["inputFolder=", 'applyTriggerAgeing=True', 'useRPC=0'], # Ageing in trigger, but not in reco segments
-    'noage_withrpc'        : ["inputFolder=", 'useRPC=1'],
-    'age_withrpc'          : ["inputFolder=", 'applyTriggerAgeing=True', 'applySegmentAgeing=True', 'useRPC=1'],
-    'age_withrpc_youngseg' : ["inputFolder=", 'applyTriggerAgeing=True', 'useRPC=1'], # Ageing in trigger, but not in reco segments
+    'noage_norpc'          : ["inputFolder=", 'applyTriggerAgeing=False', 'applySegmentAgeing=False', 'useRPC=0'],
+    'age_norpc'            : ["inputFolder=", 'applyTriggerAgeing=True',  'applySegmentAgeing=True',  'useRPC=0'],
+    'age_norpc_youngseg'   : ["inputFolder=", 'applyTriggerAgeing=True',  'applySegmentAgeing=False', 'useRPC=0'], # Ageing in trigger, but not in reco segments
+    'noage_withrpc'        : ["inputFolder=", 'applyTriggerAgeing=False', 'applySegmentAgeing=False', 'useRPC=1'],
+    'age_withrpc'          : ["inputFolder=", 'applyTriggerAgeing=True',  'applySegmentAgeing=True',  'useRPC=1'],
+    'age_withrpc_youngseg' : ["inputFolder=", 'applyTriggerAgeing=True',  'applySegmentAgeing=False', 'useRPC=1'], # Ageing in trigger, but not in reco segments
 }
 
 ageing_scenarios = {
-    'muonage_norpcage_nofail_3000_OLD': ['ageingInput=sqlite_file:MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db', "ageingTag=MuonSystemAging_3000fbm1"],
-    'muonage_norpcage_nofail_3000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_3000fbm1_DT_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_3000fbm1_DT_L1TTDR"],
+    'muonage_norpcage_nofail_3000_OLD': ['ageingInput=sqlite_file:MuonAgeingNotFailures_3000fbm1_OLDSCENARIO.db',         "ageingTag=MuonSystemAging_3000fbm1",                     "applyRpcAgeing=False"],
+    'muonage_norpcage_nofail_3000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_3000fbm1_DT_L1TTDR_v1_mc.db',     "ageingTag=MuonAgeingAndFailures_3000fbm1_DT_L1TTDR",     "applyRpcAgeing=False"],
     'muonage_norpcage_fail_3000'      : ['ageingInput=sqlite_file:MuonAgeingAndFailures_3000fbm1_DT-RPC_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_3000fbm1_DT-RPC_L1TTDR", "applyRpcAgeing=True"],
-    'muonage_norpcage_nofail_1000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_1000fbm1_DT_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_1000fbm1_DT_L1TTDR"],
+    'muonage_norpcage_nofail_1000'    : ['ageingInput=sqlite_file:MuonAgeingAndFailures_1000fbm1_DT_L1TTDR_v1_mc.db',     "ageingTag=MuonAgeingAndFailures_1000fbm1_DT_L1TTDR",     "applyRpcAgeing=False"],
     'muonage_norpcage_fail_1000'      : ['ageingInput=sqlite_file:MuonAgeingAndFailures_1000fbm1_DT-RPC_L1TTDR_v1_mc.db', "ageingTag=MuonAgeingAndFailures_1000fbm1_DT-RPC_L1TTDR", "applyRpcAgeing=True"],
-    "" : [],
+    ""                                : ["applyRpcAgeing=False"],
 }
 
 dataset = {
