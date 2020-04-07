@@ -84,7 +84,7 @@ def LaunchCRABTask(tsk):
     p.start()
     p.join()
 
-    del config, res
+    del config, p
     #CMSSWConfig.configurationCache.clear() #### NOTE: this is done in order to allow the parallelised CRAB job submission. For further
                                            ## information, please check the code on [1], the commit of [2] and the discussion of [3].
                                            ## [1]: https://github.com/dmwm/CRABClient/blob/master/src/python/CRABClient/JobType/CMSSWConfig.py
