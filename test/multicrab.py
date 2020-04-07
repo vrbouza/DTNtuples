@@ -5,7 +5,7 @@ from multiprocessing import Pool
 ### Settings of the launch procedure: THEY ARE EXPECTED TO BE CHANGED DEPENDING ON THE EXECUTION
 
 # This will be used to create the CRAB workarea, as well as the output folder
-name = '2019_12_06_ProduccionBuenaDeNuGunsPaJaime'
+name = '2020_04_07_debugueopakike3'
 
 # The name will be append to the following path to set the output directory
 outputdir = '/store/user/rodrigvi/'
@@ -14,11 +14,11 @@ outputdir = '/store/user/rodrigvi/'
 #outputdir = '/store/group/phys_muon/rodrigvi/'
 
 listOfSamples = [
-    #"nopu",     # 0   PU central muon     gun sample
+    "nopu",     # 0   PU central muon     gun sample
     #"pu200",    # 200 PU central muon     gun sample
     #"nu_pu140", # 140 PU central neutrino gun sample
-    "nu_pu200", # 200 PU central neutrino gun sample
-    "nu_pu250", # 250 PU central neutrino gun sample
+    #"nu_pu200", # 200 PU central neutrino gun sample
+    #"nu_pu250", # 250 PU central neutrino gun sample
     #"nu_pu300", ### NOT FINISHED SAMPLE
 ]
 
@@ -88,12 +88,15 @@ if __name__ == '__main__':
     if not os.path.isdir("./" + tsk[3]): os.system("mkdir ./" + tsk[3])
 
     if len(sys.argv) > 1:
-        ncores = int(sys.argv[1])
-        print "\n> Parallelisation of CRAB task launching with", ncores, "cores"
-        pool = Pool(ncores)
-        pool.map(cs.LaunchCRABTask, tasks)
-        pool.close()
-        pool.join()
-        del pool
-    else:
-        for tsk in tasks: cs.LaunchCRABTask(tsk)
+        #ncores = int(sys.argv[1])
+        #print "\n> Parallelisation of CRAB task launching with", ncores, "cores"
+        #pool = Pool(ncores)
+        #pool.map(cs.LaunchCRABTask, tasks)
+        #pool.close()
+        #pool.join()
+        #del pool
+        print "> WARNING: parallelisation disabled to avoid problems in CRAB task submission procedures."
+    #else:
+        #for tsk in tasks: cs.LaunchCRABTask(tsk)
+
+    for tsk in tasks: cs.LaunchCRABTask(tsk)

@@ -44,6 +44,8 @@ def LaunchCRABTask(tsk):
     #print "\ncwd:", os.getcwd()
     #sys.exit()
     config = config()
+    def submit(config):
+        res = crabCommand('submit', config = config )
 
     config.General.workArea     = workarea
     config.General.transferLogs = True
@@ -75,7 +77,12 @@ def LaunchCRABTask(tsk):
     config.Data.inputDataset     = dataset[sample]
     config.Data.outputDatasetTag = sample + '_' + cfg + ("_" + scn) * (scn != "")
 
-    res = crabCommand('submit', config = config)
+    #res = crabCommand('submit', config = config)
+
+    p = Process(target=submit, args=(config,))
+    p.start()
+    p.join()
+
     del config, res
     #CMSSWConfig.configurationCache.clear() #### NOTE: this is done in order to allow the parallelised CRAB job submission. For further
                                            ## information, please check the code on [1], the commit of [2] and the discussion of [3].
