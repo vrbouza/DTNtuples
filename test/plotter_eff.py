@@ -8,9 +8,15 @@ r.gROOT.SetBatch(True)
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/IndividualApplyingOfCuts/"
 #path = "~vrbouza/www/Miscelánea/2019_11_11_plots_eff_shiftsoff/AgeingComparisons/"
 #path = "~vrbouza/www/Miscelánea/2020_02_27_plots_eff_shiftsoff/"
-path = "~vrbouza/www/Miscelánea/2020_03_27_plots_eff_shiftsoff_pakike/"
+#path = "~vrbouza/www/Miscelánea/2020_03_27_plots_eff_shiftsoff_pakike/"
+#path = "~vrbouza/www/Miscelánea/2020_04_03_plots_eff_shiftsoff_pakike/"
+#path = "~vrbouza/www/Miscelánea/2020_04_03_plots_eff_shiftsoff_pajaime/"
+path = "~vrbouza/www/Miscelánea/2020_04_15_plots_eff_shiftsoff_pakike/"
 
-openingpath  = "./results_pakike/"
+openingpath  = "./results_pakike_2020_04_15/"
+#openingpath  = "./results/"
+#openingpath  = "/nfs/fanae/user/palencia/effsDTntuple/DTNtuples/test/resultsKike/"
+#openingpath  = "/nfs/fanae/user/palencia/effsDTntuple/DTNtuples/test/resultsStandardKike/"
 plotscaffold = "hEff_{st}_{al}_{ty}"
 savescaffold = "hEff_{pu}{qu}{id}"
 chambTag     = ["MB1", "MB2", "MB3", "MB4"]
@@ -33,7 +39,7 @@ def makeresplot(hlist, aged, algo, qual = "", pu = "nopu", ind = "", neutr = "")
 
     openfile = "results_eff_" + neutr + pu + "_" + (aged if "noage" in aged else "age") + "_" + ("with" * ("RPC" in algo) + "no" * ("RPC" not in algo)) + "rpc_" + qual + "_" * ("noage" not in aged) + ind + aged * ("noage" not in aged) + suffix + ".root"
 
-    if "_fail_" in aged and "+RPC" not in algo: openfile = openfile.replace("_fail_", "_nofail_")
+    #if "_fail_" in aged and "+RPC" not in algo: openfile = openfile.replace("_fail_", "_nofail_")
 
     print "The file that it's going to be opened is", openfile
     res = r.TFile.Open(openingpath + openfile, "read")
@@ -321,7 +327,7 @@ def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
     listofplots = []
 
     makeresplot(listofplots, "noage", "AM",     qual, "nopu" if not pu else "pu200", ind)
-    makeresplot(listofplots, "noage", "HB",     qual, "nopu" if not pu else "pu200", ind)
+    #makeresplot(listofplots, "noage", "HB",     qual, "nopu" if not pu else "pu200", ind)
     makeresplot(listofplots, "noage", "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
     #makeresplot(listofplots, scenariolist[1],   "AM",     qual, "nopu" if not pu else "pu200", ind)
@@ -330,7 +336,7 @@ def producetheTDRplot(qual = "", pu = False, ind = "", zoom = True):
 
 
     makeresplot(listofplots, scenariolist[2],   "AM",     qual, "nopu" if not pu else "pu200", ind)
-    makeresplot(listofplots, scenariolist[2],   "HB",     qual, "nopu" if not pu else "pu200", ind)
+    #makeresplot(listofplots, scenariolist[2],   "HB",     qual, "nopu" if not pu else "pu200", ind)
     makeresplot(listofplots, scenariolist[2],   "AM+RPC", qual, "nopu" if not pu else "pu200", ind)
 
     #makeresplot(listofplots, "noage", "AM",     qual, "nopu" if not pu else "pu200", ind)
