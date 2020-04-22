@@ -58,6 +58,7 @@ def LaunchCRABTask(tsk):
     config.JobType.pyCfgParams = running_options[cfg] + ageing_scenarios[scn]
 
     config.JobType.maxMemoryMB = 2500
+    config.JobType.allowUndistributedCMSSW = True
 
     config.Data.inputDBS    = 'global'
     config.Data.splitting   = 'FileBased'
